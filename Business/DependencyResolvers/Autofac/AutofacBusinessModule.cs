@@ -1,8 +1,13 @@
-﻿using Autofac;
+﻿using System.Reflection;
+using Autofac;
+using Autofac.Extras.DynamicProxy;
 using Business.Abstract;
 using Business.Concrete;
+using Castle.DynamicProxy;
+using Core.Utilities.Interceptors;
 using DataAccess.Abstract;
 using DataAccess.Concrete.EntityFramework;
+using Module = Autofac.Module;
 
 namespace Business.DependencyResolvers.Autofac;
 
@@ -18,5 +23,13 @@ public class AutofacBusinessModule : Module
 
         builder.RegisterType<AuthorManager>().As<IAuthorService>().SingleInstance();
         builder.RegisterType<EfAuthorDal>().As<IAuthorDal>().SingleInstance();
+
+        var assembly = Assembly.GetExecutingAssembly();
+
+        builder.RegisterAssemblyTypes(assembly).AsImplementedInterfaces().EnableInterfaceInterceptors(
+            new ProxyGenerationOptions()
+            {
+                Selector = new AspectInterceptorSelector()
+            }).SingleInstance();
     }
 }
