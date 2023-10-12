@@ -1,23 +1,14 @@
-using Business.Abstract;
-using Business.Concrete;
-using DataAccess.Abstract;
-using DataAccess.Concrete.EntityFramework;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using Business.DependencyResolvers.Autofac;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-
-builder.Services.AddSingleton<IBookService, BookManager>();
-builder.Services.AddSingleton<IBookDal, EfBookDal>();
-
-builder.Services.AddSingleton<IGenreService, GenreManager>();
-builder.Services.AddSingleton<IGenreDal, EfGenreDal>();
-
-builder.Services.AddSingleton<IAuthorService, AuthorManager>();
-builder.Services.AddSingleton<IAuthorDal, EfAuthorDal>();
-
+builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory())
+    .ConfigureContainer<ContainerBuilder>(register => register.RegisterModule(new AutofacBusinessModule()));
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

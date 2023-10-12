@@ -1,5 +1,7 @@
 ﻿using Business.Abstract;
 using Business.Constants;
+using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Validation;
 using Core.Utilities.Results.Abstract;
 using Core.Utilities.Results.Concrete;
 using DataAccess.Abstract;
@@ -22,13 +24,9 @@ public class BookManager : IBookService
         return new SuccessDataResult<List<Book>>(_bookDal.GetAll(), Messages.BooksListed);
     }
 
+    [ValidationAspect(typeof(BookValidator))]
     public IResult Add(Book book)
     {
-        if (book.BookName.Length < 2)
-        {
-            return new ErrorResult(Messages.BookNameInvalid);
-        }
-
         book.BookId = Guid.NewGuid();
         _bookDal.Add(book);
         return new SuccessResult(Messages.BookAdded);
