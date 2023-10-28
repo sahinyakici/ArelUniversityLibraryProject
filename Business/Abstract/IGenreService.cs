@@ -7,5 +7,6 @@ public interface IGenreService
 {
     IDataResult<List<Genre>> GetAll();
     IDataResult<Genre> GetById(Guid genreId);
+    IDataResult<Genre> GetByName(string genreName);
     IResult Add(Genre genre);
 }

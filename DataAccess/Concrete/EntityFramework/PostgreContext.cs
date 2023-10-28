@@ -9,6 +9,7 @@ public class PostgreContext : DbContext
     public DbSet<Author> Authors { get; set; }
     public DbSet<Genre> Genres { get; set; }
     public DbSet<Rental> Rentals { get; set; }
+    public DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
