@@ -60,7 +60,7 @@ public class InMemoryBookDal : IBookDal
         _books.Remove(bookToDelete);
     }
 
-    public List<BookDetailDto> GetBookDetails()
+    public List<BookDTO> GetBookDetails()
     {
         throw new NotImplementedException();
     }

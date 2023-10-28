@@ -15,7 +15,7 @@ namespace WebAPI.Controllers
             _genreService = genreService;
         }
 
-        [HttpGet("getall")]
+        [HttpGet("GetAll")]
         public ActionResult GetAll()
         {
             var result = _genreService.GetAll();
@@ -27,7 +27,7 @@ namespace WebAPI.Controllers
             return BadRequest(result.Message);
         }
 
-        [HttpGet("getbyid")]
+        [HttpGet("GetById")]
         public IActionResult GetById(Guid guid)
         {
             var result = _genreService.GetById(guid);
@@ -39,7 +39,7 @@ namespace WebAPI.Controllers
             return BadRequest(result.Message);
         }
 
-        [HttpPatch("add")]
+        [HttpPatch("Add")]
         public IActionResult Add(Genre genre)
         {
             var result = _genreService.Add(genre);

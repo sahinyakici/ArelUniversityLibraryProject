@@ -1,3 +1,4 @@
+using AutoMapper;
 using Business.Abstract;
 using Entities.Concrete;
 using Microsoft.AspNetCore.Mvc;
@@ -8,14 +9,16 @@ namespace WebAPI.Controllers
     [ApiController]
     public class AuthorsController : ControllerBase
     {
+        private readonly IMapper _mapper;
         private IAuthorService _authorManager;
 
-        public AuthorsController(IAuthorService authorManager)
+        public AuthorsController(IAuthorService authorManager, IMapper mapper)
         {
             _authorManager = authorManager;
+            _mapper = mapper;
         }
 
-        [HttpGet("getall")]
+        [HttpGet("GetAll")]
         public IActionResult GetAll()
         {
             var result = _authorManager.GetAll();
@@ -27,7 +30,7 @@ namespace WebAPI.Controllers
             return BadRequest(result.Message);
         }
 
-        [HttpGet("getbyid")]
+        [HttpGet("GetById")]
         public IActionResult GetById(Guid guid)
         {
             var result = _authorManager.GetById(guid);
@@ -39,7 +42,7 @@ namespace WebAPI.Controllers
             return BadRequest(result.Message);
         }
 
-        [HttpPost("add")]
+        [HttpPost("Add")]
         public IActionResult Add(Author author)
         {
             var result = _authorManager.Add(author);
