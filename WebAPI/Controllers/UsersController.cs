@@ -1,5 +1,5 @@
 using Business.Abstract;
-using Entities.Concrete;
+using Core.Entities.Concrete;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
@@ -39,10 +39,10 @@ namespace WebAPI.Controllers
             return BadRequest(result.Message);
         }
 
-        [HttpGet("GetByName")]
-        public IActionResult GetByName(string name)
+        [HttpGet("GetByUserName")]
+        public IActionResult GetByName(string userName)
         {
-            var result = _userService.GetByName(name);
+            var result = _userService.GetByUserName(userName);
             if (result.Success)
             {
                 return Ok(result);
@@ -55,18 +55,6 @@ namespace WebAPI.Controllers
         public IActionResult GetByEmail(string email)
         {
             var result = _userService.GetByMail(email);
-            if (result.Success)
-            {
-                return Ok(result);
-            }
-
-            return BadRequest(result.Message);
-        }
-
-        [HttpPost("Add")]
-        public IActionResult Add(User user)
-        {
-            var result = _userService.Add(user);
             if (result.Success)
             {
                 return Ok(result);

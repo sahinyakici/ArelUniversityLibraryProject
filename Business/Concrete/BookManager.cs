@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Business.Abstract;
+using Business.BusinessAspects.Autofac;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
 using Core.Aspects.Autofac.Validation;
+using Core.Entities.Concrete;
 using Core.Utilities.Business;
 using Core.Utilities.Results.Abstract;
 using Core.Utilities.Results.Concrete;
@@ -38,26 +40,28 @@ public class BookManager : IBookService
             return new SuccessDataResult<List<Book>>(books, Messages.BooksListed);
         }
 
-        return new ErrorDataResult<List<Book>>(books, Messages.BooksNotListed);
+        return new ErrorDataResult<List<Book>>(Messages.BooksNotListed);
     }
 
     [ValidationAspect(typeof(BookDtoValidator))]
+    [SecuredOperation("books.add,admin,editor,user")]
     public IResult Add(BookDTO bookDto)
     {
         BusinessRules.Run(CreateGenreIfNotExists(bookDto.GenreName), CreateAuthorIfNotExists(bookDto.AuthorName));
         Book book = _mapper.Map<Book>(bookDto);
-        book.BookId = Guid.NewGuid();
         _bookDal.Add(book);
         return new SuccessResult(Messages.BookAdded);
     }
 
     [ValidationAspect(typeof(BookDtoValidator))]
+    [SecuredOperation("books.update,admin,editor,user")]
     public IResult Update(Book book)
     {
         _bookDal.Update(book);
         return new SuccessResult(Messages.BookUpdated);
     }
 
+    [SecuredOperation("books.delete,admin,editor,user")]
     public IResult Delete(Book book)
     {
         _bookDal.Delete(book);
@@ -72,7 +76,7 @@ public class BookManager : IBookService
             return new SuccessDataResult<List<Book>>(books, Messages.BooksListed);
         }
 
-        return new ErrorDataResult<List<Book>>(books, Messages.BooksNotListed);
+        return new ErrorDataResult<List<Book>>(Messages.BooksNotListed);
     }
 
     public IDataResult<List<Book>> GetAllByAuthor(Guid authorId)
@@ -83,12 +87,12 @@ public class BookManager : IBookService
             return new SuccessDataResult<List<Book>>(books, Messages.BooksListed);
         }
 
-        return new ErrorDataResult<List<Book>>(books, Messages.BooksNotListed);
+        return new ErrorDataResult<List<Book>>(Messages.BooksNotListed);
     }
 
     public IDataResult<List<Book>> GetAllByOwnerName(string ownerName)
     {
-        var result = _userService.GetByName(ownerName);
+        var result = _userService.GetByFirstName(ownerName);
         if (result.Success)
         {
             User user = result.Data;
@@ -96,7 +100,7 @@ public class BookManager : IBookService
             return new SuccessDataResult<List<Book>>(books, Messages.BooksListed);
         }
 
-        return new ErrorDataResult<List<Book>>(new List<Book>(), Messages.UserNotFound);
+        return new ErrorDataResult<List<Book>>(Messages.UserNotFound);
     }
 
     public IDataResult<Book> GetById(Guid id)
@@ -107,7 +111,7 @@ public class BookManager : IBookService
             return new SuccessDataResult<Book>(_bookDal.Get(book => book.BookId == id), Messages.BooksListed);
         }
 
-        return new ErrorDataResult<Book>(result, Messages.BookNotFound);
+        return new ErrorDataResult<Book>(Messages.BookNotFound);
     }
 
     private IDataResult<Genre> CreateGenreIfNotExists(string genreName)
@@ -125,7 +129,7 @@ public class BookManager : IBookService
             return new SuccessDataResult<Genre>(genre, Messages.GenreCreated);
         }
 
-        return new ErrorDataResult<Genre>(genre, Messages.GenreNotFound);
+        return new ErrorDataResult<Genre>(Messages.GenreNotFound);
     }
 
     private IDataResult<Author> CreateAuthorIfNotExists(string authorName)
@@ -143,6 +147,6 @@ public class BookManager : IBookService
             return new SuccessDataResult<Author>(author, createResult.Message);
         }
 
-        return new ErrorDataResult<Author>(author, Messages.AuthorNotFound);
+        return new ErrorDataResult<Author>(Messages.AuthorNotFound);
     }
 }

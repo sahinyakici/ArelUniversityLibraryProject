@@ -7,7 +7,7 @@ public class BookDtoValidator : AbstractValidator<BookDTO>
 {
     public BookDtoValidator()
     {
-        RuleFor(bookDtoDto => bookDtoDto.BookName).NotNull();
+        RuleFor(bookDto => bookDto.BookName).NotNull();
         RuleFor(bookDto => bookDto.BookName).NotEmpty();
         RuleFor(bookDto => bookDto.BookName).MinimumLength(2);
 

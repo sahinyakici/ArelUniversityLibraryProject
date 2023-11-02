@@ -1,5 +1,8 @@
 ﻿using Business.Abstract;
+using Business.BusinessAspects.Autofac;
 using Business.Constants;
+using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Validation;
 using Core.Utilities.Results.Abstract;
 using Core.Utilities.Results.Concrete;
 using DataAccess.Abstract;
@@ -24,7 +27,7 @@ public class GenreManager : IGenreService
             return new SuccessDataResult<List<Genre>>(genres, Messages.GenresListed);
         }
 
-        return new ErrorDataResult<List<Genre>>(genres, Messages.GenresNotListed);
+        return new ErrorDataResult<List<Genre>>(Messages.GenresNotListed);
     }
 
     public IDataResult<Genre> GetById(Guid genreId)
@@ -32,7 +35,7 @@ public class GenreManager : IGenreService
         Genre genre = _genreDal.Get(g => g.GenreId == genreId);
         if (genre == null)
         {
-            return new ErrorDataResult<Genre>(genre, Messages.GenreNotFound);
+            return new ErrorDataResult<Genre>(Messages.GenreNotFound);
         }
 
         return new SuccessDataResult<Genre>(genre, Messages.GenreWasFound);
@@ -46,9 +49,11 @@ public class GenreManager : IGenreService
             return new SuccessDataResult<Genre>(genre, Messages.GenreWasFound);
         }
 
-        return new ErrorDataResult<Genre>(genre, Messages.GenreNotFound);
+        return new ErrorDataResult<Genre>(Messages.GenreNotFound);
     }
 
+    [SecuredOperation("genre.add,admin,editor,user")]
+    [ValidationAspect(typeof(GenreValidator))]
     public IResult Add(Genre genre)
     {
         if (genre.GenreId == null)
@@ -58,5 +63,18 @@ public class GenreManager : IGenreService
 
         _genreDal.Add(genre);
         return new SuccessResult(Messages.GenreAdded);
+    }
+
+    [SecuredOperation("genre.add,admin,editor")]
+    [ValidationAspect(typeof(GenreValidator))]
+    public IResult Update(Genre genre)
+    {
+        if (genre.GenreId == null)
+        {
+            return new ErrorResult(Messages.IdIsRequired);
+        }
+
+        _genreDal.Update(genre);
+        return new SuccessResult(Messages.GenreWasUpdated);
     }
 }

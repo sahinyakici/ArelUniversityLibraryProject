@@ -9,4 +9,5 @@ public interface IGenreService
     IDataResult<Genre> GetById(Guid genreId);
     IDataResult<Genre> GetByName(string genreName);
     IResult Add(Genre genre);
+    IResult Update(Genre genre);
 }

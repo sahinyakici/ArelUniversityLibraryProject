@@ -6,9 +6,11 @@ using Business.Abstract;
 using Business.Concrete;
 using Business.Mappers.AutoMapper;
 using Business.Mappers.AutoMapper.Resolvers;
+using Business.Mappers.AutoMapper.Resolvers.UserOperationClaimResolver;
 using Business.Mappers.AutoMapper.Resolvers.UserResolver;
 using Castle.DynamicProxy;
 using Core.Utilities.Interceptors;
+using Core.Utilities.Security.JWT;
 using DataAccess.Abstract;
 using DataAccess.Concrete.EntityFramework;
 using Module = Autofac.Module;
@@ -40,6 +42,17 @@ public class AutofacBusinessModule : Module
         builder.RegisterType<UserNameResolver>().AsSelf().SingleInstance();
         builder.RegisterType<UserIdResolver>().AsSelf().SingleInstance();
 
+        builder.RegisterType<AuthManager>().As<IAuthService>();
+        builder.RegisterType<JwtHelper>().As<ITokenHelper>();
+
+        builder.RegisterType<OperationClaimManager>().As<IOperationClaimService>().SingleInstance();
+        builder.RegisterType<EfOperationClaimDal>().As<IOperationClaimDal>().SingleInstance();
+
+        builder.RegisterType<UserOperationClaimManager>().As<IUserOperationClaimService>().SingleInstance();
+        builder.RegisterType<EfUserOperationClaimDal>().As<IUserOperationClaimDal>().SingleInstance();
+
+        builder.RegisterType<UserOperationUserIdResolver>().AsSelf().SingleInstance();
+        builder.RegisterType<UserOperationClaimIdResolver>().AsSelf().SingleInstance();
 
         var assembly = Assembly.GetExecutingAssembly();
 

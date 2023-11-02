@@ -1,6 +1,10 @@
 ﻿using AutoMapper;
 using Business.Mappers.AutoMapper.Resolvers;
+using Business.Mappers.AutoMapper.Resolvers.UserOperationClaimResolver;
 using Business.Mappers.AutoMapper.Resolvers.UserResolver;
+using Core.Entities;
+using Core.Entities.Concrete;
+using Core.Utilities.Security.Hashing;
 using Entities.Concrete;
 using Entities.DTOs;
 
@@ -20,6 +24,21 @@ public class MapperProfile : Profile
             .ForMember(dest => dest.GenreId, opt => opt.MapFrom<GenreIdResolver>())
             .ForMember(dest => dest.AuthorId, opt => opt.MapFrom<AuthorIdResolver>())
             .ForMember(dest => dest.OwnerId, opt => opt.MapFrom<UserIdResolver>())
-            ;
+            .AfterMap((source, dest) => { dest.BookId = Guid.NewGuid(); });
+
+        CreateMap<UserForRegisterDto, User>().AfterMap((source, dest) =>
+        {
+            byte[] passwordHash, passwordSalt;
+            HashingHelper.CreatePasswordHash(source.Password, out passwordHash, out passwordSalt);
+
+            dest.UserId = Guid.NewGuid();
+            dest.PasswordSalt = passwordSalt;
+            dest.PasswordHash = passwordHash;
+            dest.Status = true;
+        });
+
+        CreateMap<UserOperationClaimDto, UserOperationClaim>()
+            .ForMember(dest => dest.UserId, opt => opt.MapFrom<UserOperationUserIdResolver>())
+            .ForMember(dest => dest.OperationClaimId, opt => opt.MapFrom<UserOperationClaimIdResolver>());
     }
 }

@@ -39,10 +39,22 @@ namespace WebAPI.Controllers
             return BadRequest(result.Message);
         }
 
-        [HttpPatch("Add")]
+        [HttpPost("Add")]
         public IActionResult Add(Genre genre)
         {
             var result = _genreService.Add(genre);
+            if (result.Success)
+            {
+                return Ok(result.Success);
+            }
+
+            return BadRequest(result.Message);
+        }
+
+        [HttpPatch("Update")]
+        public IActionResult Update(Genre genre)
+        {
+            var result = _genreService.Update(genre);
             if (result.Success)
             {
                 return Ok(result.Success);

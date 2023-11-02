@@ -1,5 +1,8 @@
 ﻿using Business.Abstract;
+using Business.BusinessAspects.Autofac;
 using Business.Constants;
+using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Validation;
 using Core.Utilities.Results.Abstract;
 using Core.Utilities.Results.Concrete;
 using DataAccess.Abstract;
@@ -24,7 +27,7 @@ public class AuthorManager : IAuthorService
             return new SuccessDataResult<List<Author>>(authors);
         }
 
-        return new ErrorDataResult<List<Author>>(authors, Messages.AuthorsNotFound);
+        return new ErrorDataResult<List<Author>>(Messages.AuthorsNotFound);
     }
 
     public IDataResult<Author> GetById(Guid guid)
@@ -35,7 +38,7 @@ public class AuthorManager : IAuthorService
             return new SuccessDataResult<Author>(author);
         }
 
-        return new ErrorDataResult<Author>(author, Messages.AuthorNotFound);
+        return new ErrorDataResult<Author>(Messages.AuthorNotFound);
     }
 
     public IDataResult<Author> GetByName(string authorName)
@@ -46,9 +49,11 @@ public class AuthorManager : IAuthorService
             return new SuccessDataResult<Author>(author, Messages.AuthorWasFound);
         }
 
-        return new ErrorDataResult<Author>(author, Messages.AuthorNotFound);
+        return new ErrorDataResult<Author>(Messages.AuthorNotFound);
     }
 
+    [SecuredOperation("author.add,admin,editor,user")]
+    [ValidationAspect(typeof(AuthorValidator))]
     public IResult Add(Author author)
     {
         if (author.AuthorId == null)
@@ -58,5 +63,13 @@ public class AuthorManager : IAuthorService
 
         _authorDal.Add(author);
         return new SuccessResult(Messages.AuthorAdded);
+    }
+
+    [SecuredOperation("author.update,admin,editor")]
+    [ValidationAspect(typeof(AuthorValidator))]
+    public IResult Update(Author author)
+    {
+        _authorDal.Update(author);
+        return new SuccessResult(Messages.AuthorUpdated);
     }
 }

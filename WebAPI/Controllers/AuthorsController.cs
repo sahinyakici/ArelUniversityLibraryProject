@@ -53,5 +53,17 @@ namespace WebAPI.Controllers
 
             return BadRequest(result.Message);
         }
+
+        [HttpPatch("Update")]
+        public IActionResult Update(Author author)
+        {
+            var result = _authorManager.Update(author);
+            if (result.Success)
+            {
+                return Ok(result.Success);
+            }
+
+            return BadRequest(result.Message);
+        }
     }
 }
