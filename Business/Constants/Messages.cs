@@ -26,4 +26,21 @@ public static class Messages
     public static string UserUpdated = "Kullanıcı güncellendi";
     public static string GenreCreated = "Tür oluşturuldu";
     public static string AuthorWasFound = "Yazar bulundu";
+    public static string AuthorizationDenied = "Yetkiniz yok";
+    public static string ClaimsNotFound = "Yetkiler getirilemedi";
+    public static string UserRegistered = "Kullanıcı kayıt edildi";
+    public static string PasswordError = "Şifre hatalı";
+    public static string SuccessfulLogin = "Giriş başarılı";
+    public static string UserAlreadyExists = "Bu mail ile kayıtlı kullanıcı var";
+    public static string UserNameAlreadyExists = "Bu kullanıcı adı kullanılıyor";
+    public static string AccessTokenCreated = "Token oluşturuldu";
+    public static string AccessTokenNotCreated = "Token oluşturulamadı";
+    public static string ClaimIsFound = "Hak getirildi";
+    public static string UserOperationClaimAdded = "Kullanıcıya haklar eklendi";
+    public static string UserOperationClaimDeleted = "Kullanıcı hakkı silindi";
+    public static string UserOperationsDeleted = "Kullanıcının tüm hakları silindi";
+    public static string UserOperationsFinded = "Kullanıcının tüm hakları getirildi";
+    public static string AuthorUpdated = "Yazar güncellendi";
+    public static string IdIsRequired = "ID gerekli";
+    public static string GenreWasUpdated = "Tür güncellendi";
 }

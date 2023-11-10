@@ -9,4 +9,5 @@ public interface IAuthorService
     IDataResult<Author> GetById(Guid guid);
     IDataResult<Author> GetByName(string authorName);
     IResult Add(Author author);
+    IResult Update(Author author);
 }
