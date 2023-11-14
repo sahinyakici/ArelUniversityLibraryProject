@@ -2,6 +2,9 @@
 using Business.BusinessAspects.Autofac;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Caching;
+using Core.Aspects.Autofac.Performance;
+using Core.Aspects.Autofac.Transaction;
 using Core.Aspects.Autofac.Validation;
 using Core.Utilities.Results.Abstract;
 using Core.Utilities.Results.Concrete;
@@ -19,6 +22,8 @@ public class GenreManager : IGenreService
         _genreDal = genreDal;
     }
 
+    [PerformanceAspect(2)]
+    [CacheAspect]
     public IDataResult<List<Genre>> GetAll()
     {
         List<Genre> genres = _genreDal.GetAll();
@@ -30,6 +35,8 @@ public class GenreManager : IGenreService
         return new ErrorDataResult<List<Genre>>(Messages.GenresNotListed);
     }
 
+    [PerformanceAspect(2)]
+    [CacheAspect]
     public IDataResult<Genre> GetById(Guid genreId)
     {
         Genre genre = _genreDal.Get(g => g.GenreId == genreId);
@@ -41,6 +48,8 @@ public class GenreManager : IGenreService
         return new SuccessDataResult<Genre>(genre, Messages.GenreWasFound);
     }
 
+    [PerformanceAspect(2)]
+    [CacheAspect]
     public IDataResult<Genre> GetByName(string genreName)
     {
         Genre genre = _genreDal.Get(genre => genre.GenreName.ToLower() == genreName.ToLower());
@@ -52,8 +61,10 @@ public class GenreManager : IGenreService
         return new ErrorDataResult<Genre>(Messages.GenreNotFound);
     }
 
+    [CacheRemoveAspect("IGenreService.Get")]
     [SecuredOperation("genre.add,admin,editor,user")]
     [ValidationAspect(typeof(GenreValidator))]
+    [TransactionScopeAspect]
     public IResult Add(Genre genre)
     {
         if (genre.GenreId == null)
@@ -65,8 +76,10 @@ public class GenreManager : IGenreService
         return new SuccessResult(Messages.GenreAdded);
     }
 
+    [CacheRemoveAspect("IGenreService.Get")]
     [SecuredOperation("genre.add,admin,editor")]
     [ValidationAspect(typeof(GenreValidator))]
+    [TransactionScopeAspect]
     public IResult Update(Genre genre)
     {
         if (genre.GenreId == null)

@@ -1,5 +1,4 @@
 ﻿using Core.Utilities.Results.Abstract;
-using Core.Utilities.Results.Concrete;
 
 namespace Core.Utilities.Business;
 
@@ -15,6 +14,6 @@ public class BusinessRules
             }
         }
 
-        return new SuccessResult();
+        return null;
     }
 }

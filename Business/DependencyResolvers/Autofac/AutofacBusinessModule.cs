@@ -6,6 +6,7 @@ using Business.Abstract;
 using Business.Concrete;
 using Business.Mappers.AutoMapper;
 using Business.Mappers.AutoMapper.Resolvers;
+using Business.Mappers.AutoMapper.Resolvers.RentalResolver;
 using Business.Mappers.AutoMapper.Resolvers.UserOperationClaimResolver;
 using Business.Mappers.AutoMapper.Resolvers.UserResolver;
 using Castle.DynamicProxy;
@@ -33,6 +34,9 @@ public class AutofacBusinessModule : Module
         builder.RegisterType<AuthorManager>().As<IAuthorService>().SingleInstance();
         builder.RegisterType<EfAuthorDal>().As<IAuthorDal>().SingleInstance();
 
+        builder.RegisterType<RentalManager>().As<IRentalService>().SingleInstance();
+        builder.RegisterType<EfRentalDal>().As<IRentalDal>().SingleInstance();
+
         builder.RegisterType<GenreNameResolver>().AsSelf().SingleInstance();
         builder.RegisterType<GenreIdResolver>().AsSelf().SingleInstance();
 
@@ -41,6 +45,10 @@ public class AutofacBusinessModule : Module
 
         builder.RegisterType<UserNameResolver>().AsSelf().SingleInstance();
         builder.RegisterType<UserIdResolver>().AsSelf().SingleInstance();
+
+        builder.RegisterType<RentalDtoOwnerNameResolver>().AsSelf().SingleInstance();
+        builder.RegisterType<RentalDtoBookNameResolver>().AsSelf().SingleInstance();
+        builder.RegisterType<RentalDtoUserNameResolver>().AsSelf().SingleInstance();
 
         builder.RegisterType<AuthManager>().As<IAuthService>();
         builder.RegisterType<JwtHelper>().As<ITokenHelper>();
@@ -67,7 +75,6 @@ public class AutofacBusinessModule : Module
             })
             .As<IMapper>()
             .InstancePerLifetimeScope();
-
 
         builder.RegisterAssemblyTypes(assembly).AsImplementedInterfaces().EnableInterfaceInterceptors(
             new ProxyGenerationOptions()

@@ -7,8 +7,6 @@ public interface IUserService
 {
     IDataResult<List<User>> GetAll();
     IDataResult<User> GetById(Guid userId);
-    IDataResult<User> GetByFirstName(string firstName);
-    IDataResult<User> GetByLastName(string lastName);
     IDataResult<User> GetByMail(string mail);
     IDataResult<User> GetByUserName(string userName);
     IResult Add(User user);

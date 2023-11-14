@@ -43,4 +43,9 @@ public static class Messages
     public static string AuthorUpdated = "Yazar güncellendi";
     public static string IdIsRequired = "ID gerekli";
     public static string GenreWasUpdated = "Tür güncellendi";
+    public static string RentalFound = "Kiralamalar getirildi";
+    public static string RentalIsAdded = "Kiralama başarılı";
+    public static string RentalIsUpdated = "Kiralama güncellendi";
+    public static string RentalIsDeleted = "Kiralama silindi";
+    public static string BookAlreadyRented = "Kitap şuan kiralanmış durumda";
 }

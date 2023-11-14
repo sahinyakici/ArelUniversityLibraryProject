@@ -11,7 +11,9 @@ public interface IBookService
     IResult Update(Book book);
     IResult Delete(Book book);
     IDataResult<List<Book>> GetAllByGenre(Guid genreId);
-    IDataResult<List<Book>> GetAllByAuthor(Guid authorId);
+    IDataResult<List<Book>> GetAllByAuthorName(string authorName);
     IDataResult<List<Book>> GetAllByOwnerName(string ownerName);
     IDataResult<Book> GetById(Guid id);
+    IResult RentalABook(Guid bookId);
+    IResult CancelRentalABook(Guid bookId);
 }

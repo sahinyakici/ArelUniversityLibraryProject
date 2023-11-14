@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Business.Mappers.AutoMapper.Resolvers;
+using Business.Mappers.AutoMapper.Resolvers.RentalResolver;
 using Business.Mappers.AutoMapper.Resolvers.UserOperationClaimResolver;
 using Business.Mappers.AutoMapper.Resolvers.UserResolver;
 using Core.Entities;
@@ -40,5 +41,10 @@ public class MapperProfile : Profile
         CreateMap<UserOperationClaimDto, UserOperationClaim>()
             .ForMember(dest => dest.UserId, opt => opt.MapFrom<UserOperationUserIdResolver>())
             .ForMember(dest => dest.OperationClaimId, opt => opt.MapFrom<UserOperationClaimIdResolver>());
+
+        CreateMap<Rental, RentalDTO>()
+            .ForMember(dest => dest.OwnerName, opt => opt.MapFrom<RentalDtoOwnerNameResolver>())
+            .ForMember(dest => dest.BookName, opt => opt.MapFrom<RentalDtoBookNameResolver>())
+            .ForMember(dest => dest.UserName, opt => opt.MapFrom<RentalDtoUserNameResolver>());
     }
 }

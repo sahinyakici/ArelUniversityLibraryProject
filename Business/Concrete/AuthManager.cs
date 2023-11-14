@@ -2,6 +2,7 @@
 using Business.Abstract;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Transaction;
 using Core.Aspects.Autofac.Validation;
 using Core.Entities;
 using Core.Entities.Concrete;
@@ -31,11 +32,16 @@ public class AuthManager : IAuthService
     }
 
     [ValidationAspect(typeof(UserRegisterValidator))]
+    [TransactionScopeAspect]
     public IDataResult<User> Register(UserForRegisterDto userForRegisterDto)
     {
         User user = _mapper.Map<User>(userForRegisterDto);
         _userService.Add(user);
-        BusinessRules.Run(AddClaimsForUser(user.UserName));
+        IResult businessRuleResult = BusinessRules.Run(AddClaimsForUser(user.UserName));
+        if (!businessRuleResult.Success)
+        {
+        }
+
         return new SuccessDataResult<User>(user, Messages.UserRegistered);
     }
 

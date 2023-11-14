@@ -72,5 +72,19 @@ namespace WebAPI.Controllers
 
             return BadRequest(result.Message);
         }
+
+        [HttpGet("GetAllByAuthorName")]
+        public IActionResult GetAllByAuthorName(string authorName)
+        {
+            var result = _bookService.GetAllByAuthorName(authorName);
+            if (result.Success)
+            {
+                List<Book> books = result.Data;
+                List<BookDTO> bookDtos = books.Select(book => _mapper.Map<BookDTO>(book)).ToList();
+                return Ok(bookDtos);
+            }
+
+            return BadRequest(result.Message);
+        }
     }
 }

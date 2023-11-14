@@ -2,6 +2,9 @@
 using Business.Abstract;
 using Business.BusinessAspects.Autofac;
 using Business.Constants;
+using Core.Aspects.Autofac.Caching;
+using Core.Aspects.Autofac.Performance;
+using Core.Aspects.Autofac.Transaction;
 using Core.Entities;
 using Core.Entities.Concrete;
 using Core.Utilities.Results.Abstract;
@@ -24,6 +27,9 @@ public class UserOperationClaimManager : IUserOperationClaimService
         _userService = userService;
     }
 
+    [CacheRemoveAspect("IUserOperationClaimService.Get")]
+    [TransactionScopeAspect]
+    [PerformanceAspect(2)]
     public IResult Add(UserOperationClaimDto userOperationClaimDto)
     {
         UserOperationClaim userOperationClaim = _mapper.Map<UserOperationClaim>(userOperationClaimDto);
@@ -31,6 +37,9 @@ public class UserOperationClaimManager : IUserOperationClaimService
         return new SuccessResult(Messages.UserOperationClaimAdded);
     }
 
+    [CacheRemoveAspect("IUserOperationClaimService.Get")]
+    [TransactionScopeAspect]
+    [PerformanceAspect(2)]
     [SecuredOperation("useroperation.delete,admin,editor")]
     public IResult Delete(UserOperationClaimDto userOperationClaimDto)
     {
@@ -39,6 +48,9 @@ public class UserOperationClaimManager : IUserOperationClaimService
         return new SuccessResult(Messages.UserOperationClaimDeleted);
     }
 
+    [CacheRemoveAspect("IUserOperationClaimService.Get")]
+    [TransactionScopeAspect]
+    [PerformanceAspect(2)]
     [SecuredOperation("useroperation.delete,admin,editor")]
     public IResult DeleteAllClaims(string userName)
     {
@@ -53,6 +65,8 @@ public class UserOperationClaimManager : IUserOperationClaimService
         return new SuccessResult(Messages.UserOperationsDeleted);
     }
 
+    [CacheAspect]
+    [PerformanceAspect(2)]
     [SecuredOperation("useroperation.get,admin,editor")]
     public DataResult<List<UserOperationClaim>> GetAllClaimsWithUserName(string userName)
     {

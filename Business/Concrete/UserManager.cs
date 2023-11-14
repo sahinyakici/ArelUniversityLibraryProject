@@ -1,6 +1,7 @@
 ﻿using Business.Abstract;
 using Business.BusinessAspects.Autofac;
 using Business.Constants;
+using Core.Aspects.Autofac.Transaction;
 using Core.Entities.Concrete;
 using Core.Utilities.Results.Abstract;
 using Core.Utilities.Results.Concrete;
@@ -17,7 +18,7 @@ public class UserManager : IUserService
         _userDal = userDal;
     }
 
-    [SecuredOperation("user.get,admin,editor")]
+    [SecuredOperation("user,admin,editor")]
     public IDataResult<List<User>> GetAll()
     {
         List<User> users = _userDal.GetAll();
@@ -32,30 +33,6 @@ public class UserManager : IUserService
     public IDataResult<User> GetById(Guid userId)
     {
         User user = _userDal.Get(g => g.UserId == userId);
-        if (user == null)
-        {
-            return new ErrorDataResult<User>(Messages.UserNotFound);
-        }
-
-        return new SuccessDataResult<User>(user, Messages.UserFound);
-    }
-
-    [SecuredOperation("user.get,admin,editor,user")]
-    public IDataResult<User> GetByFirstName(string firstName)
-    {
-        User user = _userDal.Get(g => g.FirstName == firstName);
-        if (user == null)
-        {
-            return new ErrorDataResult<User>(Messages.UserNotFound);
-        }
-
-        return new SuccessDataResult<User>(user, Messages.UserFound);
-    }
-
-    [SecuredOperation("user.get,admin,editor,user")]
-    public IDataResult<User> GetByLastName(string lastName)
-    {
-        User user = _userDal.Get(g => g.LastName == lastName);
         if (user == null)
         {
             return new ErrorDataResult<User>(Messages.UserNotFound);
@@ -86,6 +63,7 @@ public class UserManager : IUserService
         return new SuccessDataResult<User>(user, Messages.UserFound);
     }
 
+    [TransactionScopeAspect]
     public IResult Add(User user)
     {
         if (user.UserId == null)
@@ -97,6 +75,7 @@ public class UserManager : IUserService
         return new SuccessResult(Messages.UserCreated);
     }
 
+    [TransactionScopeAspect]
     [SecuredOperation("user.update,admin,editor,user")]
     public IResult Update(User user)
     {
