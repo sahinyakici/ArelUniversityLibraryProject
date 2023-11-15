@@ -16,7 +16,7 @@ public class AuthsController : ControllerBase
     }
 
     [HttpPost("login")]
-    public ActionResult Login(UserForLoginDto userForLoginDto)
+    public ActionResult Login(UserForLoginDto userForLoginDto, bool withDeleted)
     {
         var userToLogin = _authService.Login(userForLoginDto);
         if (!userToLogin.Success)
@@ -24,7 +24,7 @@ public class AuthsController : ControllerBase
             return BadRequest(userToLogin.Message);
         }
 
-        var result = _authService.CreateAccessToken(userToLogin.Data);
+        var result = _authService.CreateAccessToken(userToLogin.Data, withDeleted);
         if (result.Success)
         {
             return Ok(result.Data);

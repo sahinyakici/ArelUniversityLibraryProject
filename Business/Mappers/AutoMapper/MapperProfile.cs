@@ -35,16 +35,21 @@ public class MapperProfile : Profile
             dest.UserId = Guid.NewGuid();
             dest.PasswordSalt = passwordSalt;
             dest.PasswordHash = passwordHash;
-            dest.Status = true;
+            dest.Status = false;
         });
 
         CreateMap<UserOperationClaimDto, UserOperationClaim>()
             .ForMember(dest => dest.UserId, opt => opt.MapFrom<UserOperationUserIdResolver>())
-            .ForMember(dest => dest.OperationClaimId, opt => opt.MapFrom<UserOperationClaimIdResolver>());
+            .ForMember(dest => dest.OperationClaimId, opt => opt.MapFrom<UserOperationClaimIdResolver>())
+            .ForMember(dest => dest.UserOperationClaimId, opt => opt.MapFrom<UserOperationClaimRowIdResolver>());
 
         CreateMap<Rental, RentalDTO>()
             .ForMember(dest => dest.OwnerName, opt => opt.MapFrom<RentalDtoOwnerNameResolver>())
             .ForMember(dest => dest.BookName, opt => opt.MapFrom<RentalDtoBookNameResolver>())
             .ForMember(dest => dest.UserName, opt => opt.MapFrom<RentalDtoUserNameResolver>());
+
+        CreateMap<RentalDTO, Rental>()
+            .ForMember(dest => dest.BookId, opt => opt.MapFrom<RentalDtoBookIdResolver>())
+            .ForMember(dest => dest.UserId, opt => opt.MapFrom<RentalDtoUserIdResolver>());
     }
 }

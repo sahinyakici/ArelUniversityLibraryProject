@@ -1,5 +1,6 @@
 using Business.Abstract;
 using Entities.Concrete;
+using Entities.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
@@ -16,9 +17,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("GetRentalsByUserName")]
-        public IActionResult GetRentalsByUserName(string userName)
+        public IActionResult GetRentalsByUserName(string userName, bool withDeleted)
         {
-            var result = _rentalService.GetRentalsByUserName(userName);
+            var result = _rentalService.GetRentalsByUserName(userName, withDeleted);
             if (result.Success)
             {
                 return Ok(result);
@@ -28,9 +29,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("GetRentalsByUserId")]
-        public IActionResult GetRentalByUserId(Guid userId)
+        public IActionResult GetRentalByUserId(Guid userId, bool withDeleted)
         {
-            var result = _rentalService.GetRentalsByUserId(userId);
+            var result = _rentalService.GetRentalsByUserId(userId, withDeleted);
             if (result.Success)
             {
                 return Ok(result);
@@ -40,9 +41,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("GetRentalsByBookId")]
-        public IActionResult GetRentalsByBookId(Guid bookId)
+        public IActionResult GetRentalsByBookId(Guid bookId, bool withDeleted)
         {
-            var result = _rentalService.GetRentalsByBookId(bookId);
+            var result = _rentalService.GetRentalsByBookId(bookId, withDeleted);
             if (result.Success)
             {
                 return Ok(result);
@@ -52,9 +53,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("GetRentalById")]
-        public IActionResult GetRentalById(Guid rentalId)
+        public IActionResult GetRentalById(Guid rentalId, bool withDeleted)
         {
-            var result = _rentalService.GetRentalById(rentalId);
+            var result = _rentalService.GetRentalById(rentalId, withDeleted);
             if (result.Success)
             {
                 return Ok(result);
@@ -76,9 +77,21 @@ namespace WebAPI.Controllers
         }
 
         [HttpPatch("Update")]
-        public IActionResult Update(Rental rental)
+        public IActionResult Update(RentalDTO rentalDto)
         {
-            var result = _rentalService.Update(rental);
+            var result = _rentalService.Update(rentalDto);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+
+            return BadRequest(result.Message);
+        }
+
+        [HttpPatch("CancelRental")]
+        public IActionResult CancelRental(Guid rentalId)
+        {
+            var result = _rentalService.CancelRental(rentalId);
             if (result.Success)
             {
                 return Ok(result);
@@ -88,9 +101,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpDelete("Delete")]
-        public IActionResult Delete(Rental rental)
+        public IActionResult DeleteRental(Guid id, bool permanently)
         {
-            var result = _rentalService.Delete(rental);
+            var result = _rentalService.Delete(id, permanently);
             if (result.Success)
             {
                 return Ok(result);

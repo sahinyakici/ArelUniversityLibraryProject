@@ -1,8 +1,12 @@
-﻿namespace Core.Entities.Concrete;
+﻿using Entities.Abstract;
 
-public class UserOperationClaim : IEntity
+namespace Core.Entities.Concrete;
+
+public class UserOperationClaim : IEntity, IDeleted
 {
-    public int Id { get; set; }
+    public Guid UserOperationClaimId { get; set; }
     public Guid UserId { get; set; }
     public Guid OperationClaimId { get; set; }
+    public bool IsDeleted { get; set; }
+    public DateTime? DeleteTime { get; set; }
 }

@@ -17,6 +17,12 @@ public class UserOperationUserIdResolver : IValueResolver<UserOperationClaimDto,
     public Guid Resolve(UserOperationClaimDto source, UserOperationClaim destination, Guid destMember,
         ResolutionContext context)
     {
-        return _userService.GetByUserName(source.UserName).Data.UserId;
+        var result = _userService.GetByUserName(source.UserName);
+        if (result.Success)
+        {
+            return result.Data.UserId;
+        }
+
+        throw new Exception();
     }
 }

@@ -19,8 +19,20 @@ public class RentalDtoOwnerNameResolver : IValueResolver<Rental, RentalDTO, stri
 
     public string Resolve(Rental source, RentalDTO destination, string destMember, ResolutionContext context)
     {
-        Book book = _bookService.GetById(source.BookId).Data;
-        User owner = _userService.GetById(book.OwnerId).Data;
-        return owner.UserName;
+        var bookGetResult = _bookService.GetById(source.BookId);
+        if (bookGetResult.Success)
+        {
+            Book book = bookGetResult.Data;
+            var ownerGetResult = _userService.GetById(book.OwnerId);
+            if (ownerGetResult.Success)
+            {
+                User owner = ownerGetResult.Data;
+                return owner.UserName;
+            }
+
+            throw new Exception(ownerGetResult.Message);
+        }
+
+        throw new Exception(bookGetResult.Message);
     }
 }

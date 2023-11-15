@@ -5,11 +5,12 @@ namespace Business.Abstract;
 
 public interface IUserService
 {
-    IDataResult<List<User>> GetAll();
-    IDataResult<User> GetById(Guid userId);
-    IDataResult<User> GetByMail(string mail);
-    IDataResult<User> GetByUserName(string userName);
+    IDataResult<List<User>> GetAll(bool withDeleted = false);
+    IDataResult<User> GetById(Guid userId, bool withDeleted = false);
+    IDataResult<User> GetByMail(string mail, bool withDeleted = false);
+    IDataResult<User> GetByUserName(string userName, bool withDeleted = false);
     IResult Add(User user);
     IResult Update(User user);
-    IDataResult<List<OperationClaim>> GetClaims(User user);
+    IResult Delete(Guid userId, bool permanently = false);
+    IDataResult<List<OperationClaim>> GetClaims(User user, bool withDeleted = false);
 }

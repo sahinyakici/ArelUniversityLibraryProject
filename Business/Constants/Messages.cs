@@ -48,4 +48,14 @@ public static class Messages
     public static string RentalIsUpdated = "Kiralama güncellendi";
     public static string RentalIsDeleted = "Kiralama silindi";
     public static string BookAlreadyRented = "Kitap şuan kiralanmış durumda";
+    public static string AuthorDeletedPermanently = "Yazar kalıcı olarak silindi";
+    public static string AuthorDeleted = "Yazar silindi";
+    public static string AuthorNotDeleted = "Yazar silinemedi";
+    public static string GenreDeleted = "Tür silindi";
+    public static string GenreDeletedPermanently = "Tür kalıcı olarak silindi";
+    public static string UserOperationClaimDeletedPermanently = "Kullanıcının tüm hakları kalıcı olarak silindi";
+    public static string RentalIsDeletedPermanently = "Kiralama kalıcı olarak silindi";
+    public static string RentalNotFound = "Böyle bir kiralama bulunamadı";
+    public static string UserDeleted = "Kullanıcı silindi";
+    public static string UserDeletedPermanently = "Kullanıcı kalıcı olarak silindi";
 }

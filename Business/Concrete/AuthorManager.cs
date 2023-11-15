@@ -24,9 +24,9 @@ public class AuthorManager : IAuthorService
 
     [CacheAspect]
     [PerformanceAspect(2)]
-    public IDataResult<List<Author>> GetAll()
+    public IDataResult<List<Author>> GetAll(bool withDeleted = false)
     {
-        List<Author> authors = _authorDal.GetAll();
+        List<Author> authors = _authorDal.GetAll(author => withDeleted || !author.IsDeleted);
         if (authors != null)
         {
             return new SuccessDataResult<List<Author>>(authors);
@@ -37,9 +37,9 @@ public class AuthorManager : IAuthorService
 
     [CacheAspect]
     [PerformanceAspect(2)]
-    public IDataResult<Author> GetById(Guid guid)
+    public IDataResult<Author> GetById(Guid guid, bool withDeleted = false)
     {
-        Author author = _authorDal.Get(author => author.AuthorId == guid);
+        Author author = _authorDal.Get(author => author.AuthorId == guid && (withDeleted || !author.IsDeleted));
         if (author != null)
         {
             return new SuccessDataResult<Author>(author);
@@ -86,5 +86,28 @@ public class AuthorManager : IAuthorService
     {
         _authorDal.Update(author);
         return new SuccessResult(Messages.AuthorUpdated);
+    }
+
+    [SecuredOperation("author.update,admin,editor")]
+    [CacheRemoveAspect("IAuthorService.Get")]
+    [PerformanceAspect(2)]
+    [TransactionScopeAspect]
+    public IResult Delete(Guid authorId, bool permanently = false)
+    {
+        Author author = _authorDal.Get(author => author.AuthorId == authorId);
+        if (!permanently)
+        {
+            author.IsDeleted = true;
+            author.DeleteTime = DateTime.UtcNow;
+            _authorDal.Update(author);
+            return new SuccessResult(Messages.AuthorDeleted);
+        }
+        else
+        {
+            _authorDal.Delete(author);
+            return new SuccessResult(Messages.AuthorDeletedPermanently);
+        }
+
+        return new ErrorResult(Messages.AuthorNotDeleted);
     }
 }

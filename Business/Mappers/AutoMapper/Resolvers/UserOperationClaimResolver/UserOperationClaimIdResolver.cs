@@ -23,6 +23,6 @@ public class UserOperationClaimIdResolver : IValueResolver<UserOperationClaimDto
             return result.Data.OperationClaimId;
         }
 
-        throw new Exception();
+        throw new Exception(result.Message);
     }
 }

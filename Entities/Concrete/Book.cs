@@ -1,8 +1,9 @@
 ﻿using Core.Entities;
+using Entities.Abstract;
 
 namespace Entities.Concrete;
 
-public class Book : IEntity
+public class Book : IEntity, IDeleted
 {
     public Guid BookId { get; set; }
     public Guid GenreId { get; set; }
@@ -12,4 +13,6 @@ public class Book : IEntity
     public string Location { get; set; }
     public int PageSize { get; set; }
     public bool RentStatus { get; set; }
+    public bool IsDeleted { get; set; }
+    public DateTime? DeleteTime { get; set; }
 }

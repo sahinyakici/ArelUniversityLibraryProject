@@ -10,5 +10,5 @@ public interface IAuthService
     IDataResult<User> Register(UserForRegisterDto userForRegisterDto);
     IDataResult<User> Login(UserForLoginDto userForLoginDto);
     IResult UserExists(string email, string userName);
-    IDataResult<AccessToken> CreateAccessToken(User user);
+    IDataResult<AccessToken> CreateAccessToken(User user, bool withDeleted = false);
 }

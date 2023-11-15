@@ -16,9 +16,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("GetAll")]
-        public ActionResult GetAll()
+        public ActionResult GetAll(bool withDeleted)
         {
-            var result = _genreService.GetAll();
+            var result = _genreService.GetAll(withDeleted);
             if (result.Success)
             {
                 return Ok(result);
@@ -28,9 +28,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("GetById")]
-        public IActionResult GetById(Guid guid)
+        public IActionResult GetById(Guid guid, bool withDeleted)
         {
-            var result = _genreService.GetById(guid);
+            var result = _genreService.GetById(guid, withDeleted);
             if (result.Success)
             {
                 return Ok(result);
@@ -58,6 +58,18 @@ namespace WebAPI.Controllers
             if (result.Success)
             {
                 return Ok(result.Success);
+            }
+
+            return BadRequest(result.Message);
+        }
+
+        [HttpDelete("Delete")]
+        public IActionResult Delete(Guid genreId, bool permanently)
+        {
+            var result = _genreService.Delete(genreId, permanently);
+            if (result.Success)
+            {
+                return Ok(result);
             }
 
             return BadRequest(result.Message);

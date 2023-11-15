@@ -8,7 +8,7 @@ namespace Business.Abstract;
 public interface IUserOperationClaimService
 {
     IResult Add(UserOperationClaimDto userOperationClaimDto);
-    IResult Delete(UserOperationClaimDto userOperationClaimDto);
-    IResult DeleteAllClaims(string userName);
-    DataResult<List<UserOperationClaim>> GetAllClaimsWithUserName(string userName);
+    IResult Delete(Guid userOperationClaimId, bool permanently = false);
+    IResult DeleteAllClaims(string userName, bool permanently = false);
+    DataResult<List<UserOperationClaim>> GetAllClaimsWithUserName(string userName, bool withDeleted = false);
 }

@@ -37,9 +37,9 @@ public class BookManager : IBookService
 
     [CacheAspect]
     [PerformanceAspect(10)]
-    public IDataResult<List<Book>> GetAll()
+    public IDataResult<List<Book>> GetAll(bool withDeleted = false)
     {
-        List<Book> books = _bookDal.GetAll();
+        List<Book> books = _bookDal.GetAll(book => withDeleted || !book.IsDeleted);
         if (books != null)
         {
             return new SuccessDataResult<List<Book>>(books, Messages.BooksListed);
@@ -76,17 +76,28 @@ public class BookManager : IBookService
     [CacheRemoveAspect("IBookService.Get")]
     [TransactionScopeAspect]
     [PerformanceAspect(2)]
-    public IResult Delete(Book book)
+    public IResult Delete(Guid id, bool permanently = false)
     {
-        _bookDal.Delete(book);
+        Book deleteBook = _bookDal.Get(b => b.BookId == id);
+        if (!permanently)
+        {
+            deleteBook.IsDeleted = true;
+            deleteBook.DeleteTime = DateTime.UtcNow;
+            _bookDal.Update(deleteBook);
+        }
+        else
+        {
+            _bookDal.Delete(deleteBook);
+        }
+
         return new SuccessResult(Messages.BookDeleted);
     }
 
     [CacheAspect]
     [PerformanceAspect(5)]
-    public IDataResult<List<Book>> GetAllByGenre(Guid genreId)
+    public IDataResult<List<Book>> GetAllByGenre(Guid genreId, bool withDelete = false)
     {
-        List<Book> books = _bookDal.GetAll(b => b.GenreId == genreId);
+        List<Book> books = _bookDal.GetAll(b => b.GenreId == genreId && (withDelete || !b.IsDeleted == withDelete));
         if (books != null)
         {
             return new SuccessDataResult<List<Book>>(books, Messages.BooksListed);
@@ -97,10 +108,10 @@ public class BookManager : IBookService
 
     [CacheAspect]
     [PerformanceAspect(5)]
-    public IDataResult<List<Book>> GetAllByAuthorName(string authorName)
+    public IDataResult<List<Book>> GetAllByAuthorName(string authorName, bool withDelete = false)
     {
         Guid authorId = _authorService.GetByName(authorName).Data.AuthorId;
-        List<Book> books = _bookDal.GetAll(b => b.AuthorId == authorId);
+        List<Book> books = _bookDal.GetAll(b => b.AuthorId == authorId && (withDelete || !b.IsDeleted));
         if (books != null)
         {
             return new SuccessDataResult<List<Book>>(books, Messages.BooksListed);
@@ -111,13 +122,14 @@ public class BookManager : IBookService
 
     [CacheAspect]
     [PerformanceAspect(5)]
-    public IDataResult<List<Book>> GetAllByOwnerName(string ownerName)
+    public IDataResult<List<Book>> GetAllByOwnerName(string ownerName, bool withDelete = false)
     {
         var result = _userService.GetByUserName(ownerName);
         if (result.Success)
         {
             User user = result.Data;
-            List<Book> books = _bookDal.GetAll(book => book.OwnerId == user.UserId);
+            List<Book> books = _bookDal.GetAll(book =>
+                book.OwnerId == user.UserId && (withDelete || !book.IsDeleted));
             return new SuccessDataResult<List<Book>>(books, Messages.BooksListed);
         }
 
@@ -126,9 +138,9 @@ public class BookManager : IBookService
 
     [CacheAspect]
     [PerformanceAspect(5)]
-    public IDataResult<Book> GetById(Guid id)
+    public IDataResult<Book> GetById(Guid id, bool withDelete = false)
     {
-        var result = _bookDal.Get(book => book.BookId == id);
+        var result = _bookDal.Get(book => book.BookId == id && (withDelete || !book.IsDeleted));
         if (result != null)
         {
             return new SuccessDataResult<Book>(result, Messages.BooksListed);

@@ -41,24 +41,41 @@ public class UserOperationClaimManager : IUserOperationClaimService
     [TransactionScopeAspect]
     [PerformanceAspect(2)]
     [SecuredOperation("useroperation.delete,admin,editor")]
-    public IResult Delete(UserOperationClaimDto userOperationClaimDto)
+    public IResult Delete(Guid userOperationClaimId, bool permanently = false)
     {
-        UserOperationClaim userOperationClaim = _mapper.Map<UserOperationClaim>(userOperationClaimDto);
+        UserOperationClaim userOperationClaim =
+            _userOperationClaimDal.Get(userope => userope.UserOperationClaimId == userOperationClaimId);
+        if (!permanently)
+        {
+            userOperationClaim.IsDeleted = true;
+            userOperationClaim.DeleteTime = DateTime.UtcNow;
+            _userOperationClaimDal.Update(userOperationClaim);
+            return new SuccessResult(Messages.UserOperationsDeleted);
+        }
+
         _userOperationClaimDal.Delete(userOperationClaim);
-        return new SuccessResult(Messages.UserOperationClaimDeleted);
+        return new SuccessResult(Messages.UserOperationClaimDeletedPermanently);
     }
 
     [CacheRemoveAspect("IUserOperationClaimService.Get")]
     [TransactionScopeAspect]
     [PerformanceAspect(2)]
     [SecuredOperation("useroperation.delete,admin,editor")]
-    public IResult DeleteAllClaims(string userName)
+    public IResult DeleteAllClaims(string userName, bool permanently = false)
     {
         User user = _userService.GetByUserName(userName).Data;
         List<UserOperationClaim> userOperationClaims =
             _userOperationClaimDal.GetAll(userOperation => userOperation.UserId == user.UserId);
         foreach (UserOperationClaim userOperationClaim in userOperationClaims)
         {
+            if (!permanently)
+            {
+                userOperationClaim.IsDeleted = true;
+                userOperationClaim.DeleteTime = DateTime.UtcNow;
+                _userOperationClaimDal.Update(userOperationClaim);
+                continue;
+            }
+
             _userOperationClaimDal.Delete(userOperationClaim);
         }
 
@@ -67,12 +84,18 @@ public class UserOperationClaimManager : IUserOperationClaimService
 
     [CacheAspect]
     [PerformanceAspect(2)]
-    [SecuredOperation("useroperation.get,admin,editor")]
-    public DataResult<List<UserOperationClaim>> GetAllClaimsWithUserName(string userName)
+    public DataResult<List<UserOperationClaim>> GetAllClaimsWithUserName(string userName, bool withDeleted = false)
     {
-        User user = _userService.GetByUserName(userName).Data;
-        List<UserOperationClaim> userOperationClaims =
-            _userOperationClaimDal.GetAll(operations => operations.UserId == user.UserId);
-        return new SuccessDataResult<List<UserOperationClaim>>(userOperationClaims, Messages.UserOperationsFinded);
+        var userResult = _userService.GetByUserName(userName);
+        if (userResult.Success)
+        {
+            User user = userResult.Data;
+            List<UserOperationClaim> userOperationClaims =
+                _userOperationClaimDal.GetAll(operations =>
+                    operations.UserId == user.UserId && (withDeleted || !operations.IsDeleted));
+            return new SuccessDataResult<List<UserOperationClaim>>(userOperationClaims, Messages.UserOperationsFinded);
+        }
+
+        return new ErrorDataResult<List<UserOperationClaim>>(userResult.Message);
     }
 }

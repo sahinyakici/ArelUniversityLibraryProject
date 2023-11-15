@@ -6,11 +6,12 @@ namespace Business.Abstract;
 
 public interface IRentalService
 {
-    IDataResult<List<RentalDTO>> GetRentalsByUserName(string userName);
-    IDataResult<List<RentalDTO>> GetRentalsByUserId(Guid userId);
-    IDataResult<List<RentalDTO>> GetRentalsByBookId(Guid bookId);
-    IDataResult<RentalDTO> GetRentalById(Guid rentalId);
+    IDataResult<List<RentalDTO>> GetRentalsByUserName(string userName, bool withDeleted = false);
+    IDataResult<List<RentalDTO>> GetRentalsByUserId(Guid userId, bool withDeleted = false);
+    IDataResult<List<RentalDTO>> GetRentalsByBookId(Guid bookId, bool withDeleted = false);
+    IDataResult<RentalDTO> GetRentalById(Guid rentalId, bool withDeleted = false);
     IResult Add(Rental rental);
-    IResult Update(Rental rental);
-    IResult Delete(Rental rental, bool softDelete = true);
+    IResult Update(RentalDTO rentalDto);
+    IResult Delete(Guid id, bool permanently = false);
+    IResult CancelRental(Guid rentalId);
 }

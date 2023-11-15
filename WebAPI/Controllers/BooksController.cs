@@ -20,9 +20,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("GetAll")]
-        public IActionResult GetAll()
+        public IActionResult GetAll(bool withDeleted)
         {
-            var result = _bookService.GetAll();
+            var result = _bookService.GetAll(withDeleted);
             if (result.Success)
             {
                 List<Book> books = result.Data;
@@ -34,9 +34,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("GetById")]
-        public IActionResult GetById(Guid guid)
+        public IActionResult GetById(Guid guid, bool withDeleted)
         {
-            var result = _bookService.GetById(guid);
+            var result = _bookService.GetById(guid, withDeleted);
             if (result.Success)
             {
                 Book book = result.Data;
@@ -60,9 +60,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("GetAllByOwnerName")]
-        public IActionResult GetAllByOwnerName(string ownerName)
+        public IActionResult GetAllByOwnerName(string ownerName, bool withDeleted)
         {
-            var result = _bookService.GetAllByOwnerName(ownerName);
+            var result = _bookService.GetAllByOwnerName(ownerName, withDeleted);
             if (result.Success)
             {
                 List<Book> books = result.Data;
@@ -74,14 +74,26 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("GetAllByAuthorName")]
-        public IActionResult GetAllByAuthorName(string authorName)
+        public IActionResult GetAllByAuthorName(string authorName, bool withDeleted)
         {
-            var result = _bookService.GetAllByAuthorName(authorName);
+            var result = _bookService.GetAllByAuthorName(authorName, withDeleted);
             if (result.Success)
             {
                 List<Book> books = result.Data;
                 List<BookDTO> bookDtos = books.Select(book => _mapper.Map<BookDTO>(book)).ToList();
                 return Ok(bookDtos);
+            }
+
+            return BadRequest(result.Message);
+        }
+
+        [HttpDelete("Delete")]
+        public IActionResult Delete(Guid id, bool permanently)
+        {
+            var result = _bookService.Delete(id, permanently);
+            if (result.Success)
+            {
+                return Ok(result);
             }
 
             return BadRequest(result.Message);

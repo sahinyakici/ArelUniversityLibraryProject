@@ -6,14 +6,14 @@ namespace Business.Abstract;
 
 public interface IBookService
 {
-    IDataResult<List<Book>> GetAll();
+    IDataResult<List<Book>> GetAll(bool withDelete = false);
     IResult Add(BookDTO bookDto);
     IResult Update(Book book);
-    IResult Delete(Book book);
-    IDataResult<List<Book>> GetAllByGenre(Guid genreId);
-    IDataResult<List<Book>> GetAllByAuthorName(string authorName);
-    IDataResult<List<Book>> GetAllByOwnerName(string ownerName);
-    IDataResult<Book> GetById(Guid id);
+    IResult Delete(Guid id, bool permanently = false);
+    IDataResult<List<Book>> GetAllByGenre(Guid genreId, bool withDelete = false);
+    IDataResult<List<Book>> GetAllByAuthorName(string authorName, bool withDelete = false);
+    IDataResult<List<Book>> GetAllByOwnerName(string ownerName, bool withDelete = false);
+    IDataResult<Book> GetById(Guid id, bool withDelete = false);
     IResult RentalABook(Guid bookId);
     IResult CancelRentalABook(Guid bookId);
 }

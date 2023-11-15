@@ -19,9 +19,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("GetAll")]
-        public IActionResult GetAll()
+        public IActionResult GetAll(bool withDeleted)
         {
-            var result = _authorManager.GetAll();
+            var result = _authorManager.GetAll(withDeleted);
             if (result.Success)
             {
                 return Ok(result.Data);
@@ -31,9 +31,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("GetById")]
-        public IActionResult GetById(Guid guid)
+        public IActionResult GetById(Guid guid, bool withDeleted)
         {
-            var result = _authorManager.GetById(guid);
+            var result = _authorManager.GetById(guid, withDeleted);
             if (result.Success)
             {
                 return Ok(result.Data);
@@ -61,6 +61,18 @@ namespace WebAPI.Controllers
             if (result.Success)
             {
                 return Ok(result.Success);
+            }
+
+            return BadRequest(result.Message);
+        }
+
+        [HttpDelete("Delete")]
+        public IActionResult Delete(Guid authorId, bool permanently = false)
+        {
+            var result = _authorManager.Delete(authorId, permanently);
+            if (result.Success)
+            {
+                return Ok(result);
             }
 
             return BadRequest(result.Message);

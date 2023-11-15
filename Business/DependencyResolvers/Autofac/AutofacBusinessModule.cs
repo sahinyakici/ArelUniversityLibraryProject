@@ -49,6 +49,8 @@ public class AutofacBusinessModule : Module
         builder.RegisterType<RentalDtoOwnerNameResolver>().AsSelf().SingleInstance();
         builder.RegisterType<RentalDtoBookNameResolver>().AsSelf().SingleInstance();
         builder.RegisterType<RentalDtoUserNameResolver>().AsSelf().SingleInstance();
+        builder.RegisterType<RentalDtoBookIdResolver>().AsSelf().SingleInstance();
+        builder.RegisterType<RentalDtoUserIdResolver>().AsSelf().SingleInstance();
 
         builder.RegisterType<AuthManager>().As<IAuthService>();
         builder.RegisterType<JwtHelper>().As<ITokenHelper>();
@@ -61,6 +63,8 @@ public class AutofacBusinessModule : Module
 
         builder.RegisterType<UserOperationUserIdResolver>().AsSelf().SingleInstance();
         builder.RegisterType<UserOperationClaimIdResolver>().AsSelf().SingleInstance();
+        builder.RegisterType<UserOperationClaimRowIdResolver>().AsSelf().SingleInstance();
+
 
         var assembly = Assembly.GetExecutingAssembly();
 
