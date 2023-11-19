@@ -16,9 +16,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("GetAll")]
-        public IActionResult GetAll()
+        public IActionResult GetAll(bool withDeleted)
         {
-            var result = _userService.GetAll();
+            var result = _userService.GetAll(withDeleted);
             if (result.Success)
             {
                 return Ok(result);
@@ -28,9 +28,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("GetById")]
-        public IActionResult GetById(Guid id)
+        public IActionResult GetById(Guid id, bool withDeleted)
         {
-            var result = _userService.GetById(id);
+            var result = _userService.GetById(id, withDeleted);
             if (result.Success)
             {
                 return Ok(result);
@@ -40,9 +40,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("GetByUserName")]
-        public IActionResult GetByName(string userName)
+        public IActionResult GetByName(string userName, bool withDeleted)
         {
-            var result = _userService.GetByUserName(userName);
+            var result = _userService.GetByUserName(userName, withDeleted);
             if (result.Success)
             {
                 return Ok(result);
@@ -52,9 +52,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("GetByEmail")]
-        public IActionResult GetByEmail(string email)
+        public IActionResult GetByEmail(string email, bool withDeleted)
         {
-            var result = _userService.GetByMail(email);
+            var result = _userService.GetByMail(email, withDeleted);
             if (result.Success)
             {
                 return Ok(result);
@@ -67,6 +67,18 @@ namespace WebAPI.Controllers
         public IActionResult Update(User user)
         {
             var result = _userService.Update(user);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+
+            return BadRequest(result.Message);
+        }
+
+        [HttpDelete("Delete")]
+        public IActionResult Delete(Guid userId, bool permanently)
+        {
+            var result = _userService.Delete(userId, permanently);
             if (result.Success)
             {
                 return Ok(result);

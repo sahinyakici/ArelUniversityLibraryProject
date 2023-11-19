@@ -3,6 +3,9 @@ using Business.Abstract;
 using Business.BusinessAspects.Autofac;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Caching;
+using Core.Aspects.Autofac.Performance;
+using Core.Aspects.Autofac.Transaction;
 using Core.Aspects.Autofac.Validation;
 using Core.Entities.Concrete;
 using Core.Utilities.Business;
@@ -32,9 +35,11 @@ public class BookManager : IBookService
         _userService = userService;
     }
 
-    public IDataResult<List<Book>> GetAll()
+    [CacheAspect]
+    [PerformanceAspect(10)]
+    public IDataResult<List<Book>> GetAll(bool withDeleted = false)
     {
-        List<Book> books = _bookDal.GetAll();
+        List<Book> books = _bookDal.GetAll(book => withDeleted || !book.IsDeleted);
         if (books != null)
         {
             return new SuccessDataResult<List<Book>>(books, Messages.BooksListed);
@@ -45,6 +50,9 @@ public class BookManager : IBookService
 
     [ValidationAspect(typeof(BookDtoValidator))]
     [SecuredOperation("books.add,admin,editor,user")]
+    [CacheRemoveAspect("IBookService.Get")]
+    [TransactionScopeAspect]
+    [PerformanceAspect(2)]
     public IResult Add(BookDTO bookDto)
     {
         BusinessRules.Run(CreateGenreIfNotExists(bookDto.GenreName), CreateAuthorIfNotExists(bookDto.AuthorName));
@@ -55,6 +63,9 @@ public class BookManager : IBookService
 
     [ValidationAspect(typeof(BookDtoValidator))]
     [SecuredOperation("books.update,admin,editor,user")]
+    [CacheRemoveAspect("IBookService.Get")]
+    [TransactionScopeAspect]
+    [PerformanceAspect(2)]
     public IResult Update(Book book)
     {
         _bookDal.Update(book);
@@ -62,15 +73,31 @@ public class BookManager : IBookService
     }
 
     [SecuredOperation("books.delete,admin,editor,user")]
-    public IResult Delete(Book book)
+    [CacheRemoveAspect("IBookService.Get")]
+    [TransactionScopeAspect]
+    [PerformanceAspect(2)]
+    public IResult Delete(Guid id, bool permanently = false)
     {
-        _bookDal.Delete(book);
+        Book deleteBook = _bookDal.Get(b => b.BookId == id);
+        if (!permanently)
+        {
+            deleteBook.IsDeleted = true;
+            deleteBook.DeleteTime = DateTime.UtcNow;
+            _bookDal.Update(deleteBook);
+        }
+        else
+        {
+            _bookDal.Delete(deleteBook);
+        }
+
         return new SuccessResult(Messages.BookDeleted);
     }
 
-    public IDataResult<List<Book>> GetAllByGenre(Guid genreId)
+    [CacheAspect]
+    [PerformanceAspect(5)]
+    public IDataResult<List<Book>> GetAllByGenre(Guid genreId, bool withDelete = false)
     {
-        List<Book> books = _bookDal.GetAll(b => b.GenreId == genreId);
+        List<Book> books = _bookDal.GetAll(b => b.GenreId == genreId && (withDelete || !b.IsDeleted == withDelete));
         if (books != null)
         {
             return new SuccessDataResult<List<Book>>(books, Messages.BooksListed);
@@ -79,9 +106,12 @@ public class BookManager : IBookService
         return new ErrorDataResult<List<Book>>(Messages.BooksNotListed);
     }
 
-    public IDataResult<List<Book>> GetAllByAuthor(Guid authorId)
+    [CacheAspect]
+    [PerformanceAspect(5)]
+    public IDataResult<List<Book>> GetAllByAuthorName(string authorName, bool withDelete = false)
     {
-        List<Book> books = _bookDal.GetAll(b => b.AuthorId == authorId);
+        Guid authorId = _authorService.GetByName(authorName).Data.AuthorId;
+        List<Book> books = _bookDal.GetAll(b => b.AuthorId == authorId && (withDelete || !b.IsDeleted));
         if (books != null)
         {
             return new SuccessDataResult<List<Book>>(books, Messages.BooksListed);
@@ -90,28 +120,49 @@ public class BookManager : IBookService
         return new ErrorDataResult<List<Book>>(Messages.BooksNotListed);
     }
 
-    public IDataResult<List<Book>> GetAllByOwnerName(string ownerName)
+    [CacheAspect]
+    [PerformanceAspect(5)]
+    public IDataResult<List<Book>> GetAllByOwnerName(string ownerName, bool withDelete = false)
     {
-        var result = _userService.GetByFirstName(ownerName);
+        var result = _userService.GetByUserName(ownerName);
         if (result.Success)
         {
             User user = result.Data;
-            List<Book> books = _bookDal.GetAll(book => book.OwnerId == user.UserId);
+            List<Book> books = _bookDal.GetAll(book =>
+                book.OwnerId == user.UserId && (withDelete || !book.IsDeleted));
             return new SuccessDataResult<List<Book>>(books, Messages.BooksListed);
         }
 
         return new ErrorDataResult<List<Book>>(Messages.UserNotFound);
     }
 
-    public IDataResult<Book> GetById(Guid id)
+    [CacheAspect]
+    [PerformanceAspect(5)]
+    public IDataResult<Book> GetById(Guid id, bool withDelete = false)
     {
-        var result = _bookDal.Get(book => book.BookId == id);
+        var result = _bookDal.Get(book => book.BookId == id && (withDelete || !book.IsDeleted));
         if (result != null)
         {
-            return new SuccessDataResult<Book>(_bookDal.Get(book => book.BookId == id), Messages.BooksListed);
+            return new SuccessDataResult<Book>(result, Messages.BooksListed);
         }
 
         return new ErrorDataResult<Book>(Messages.BookNotFound);
+    }
+
+    public IResult RentalABook(Guid bookId)
+    {
+        Book updateBook = _bookDal.Get(book => book.BookId == bookId);
+        updateBook.RentStatus = true;
+        _bookDal.Update(updateBook);
+        return new SuccessResult(Messages.BookUpdated);
+    }
+
+    public IResult CancelRentalABook(Guid bookId)
+    {
+        Book updateBook = _bookDal.Get(book => book.BookId == bookId);
+        updateBook.RentStatus = false;
+        _bookDal.Update(updateBook);
+        return new SuccessResult(Messages.BookUpdated);
     }
 
     private IDataResult<Genre> CreateGenreIfNotExists(string genreName)

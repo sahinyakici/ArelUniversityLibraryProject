@@ -16,9 +16,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("GetAllWithUserName")]
-        public IActionResult GetAll(string userName)
+        public IActionResult GetAll(string userName, bool withDeleted)
         {
-            var result = _userOperationClaimService.GetAllClaimsWithUserName(userName);
+            var result = _userOperationClaimService.GetAllClaimsWithUserName(userName, withDeleted);
             if (result.Success)
             {
                 return Ok(result);
@@ -40,9 +40,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpDelete("Delete")]
-        public IActionResult Delete(UserOperationClaimDto userOperationClaimDto)
+        public IActionResult Delete(Guid userOperationClaimId, bool permanently)
         {
-            var result = _userOperationClaimService.Delete(userOperationClaimDto);
+            var result = _userOperationClaimService.Delete(userOperationClaimId, permanently);
             if (result.Success)
             {
                 return Ok(result);
@@ -52,9 +52,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpDelete("DeleteAllClaims")]
-        public IActionResult DeleteAllClaims(string userName)
+        public IActionResult DeleteAllClaims(string userName, bool permanently)
         {
-            var result = _userOperationClaimService.DeleteAllClaims(userName);
+            var result = _userOperationClaimService.DeleteAllClaims(userName, permanently);
             if (result.Success)
             {
                 return Ok(result);

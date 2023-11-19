@@ -1,6 +1,7 @@
 ﻿using Business.Abstract;
 using Business.BusinessAspects.Autofac;
 using Business.Constants;
+using Core.Aspects.Autofac.Transaction;
 using Core.Entities.Concrete;
 using Core.Utilities.Results.Abstract;
 using Core.Utilities.Results.Concrete;
@@ -17,10 +18,10 @@ public class UserManager : IUserService
         _userDal = userDal;
     }
 
-    [SecuredOperation("user.get,admin,editor")]
-    public IDataResult<List<User>> GetAll()
+    [SecuredOperation("user,admin,editor")]
+    public IDataResult<List<User>> GetAll(bool withDeleted = false)
     {
-        List<User> users = _userDal.GetAll();
+        List<User> users = _userDal.GetAll(user => !user.IsDeleted || withDeleted);
         if (users != null)
         {
             return new SuccessDataResult<List<User>>(users, Messages.UsersListed);
@@ -29,9 +30,9 @@ public class UserManager : IUserService
         return new ErrorDataResult<List<User>>(Messages.UsersNotFound);
     }
 
-    public IDataResult<User> GetById(Guid userId)
+    public IDataResult<User> GetById(Guid userId, bool withDeleted = false)
     {
-        User user = _userDal.Get(g => g.UserId == userId);
+        User user = _userDal.Get(g => g.UserId == userId && (withDeleted || !g.IsDeleted));
         if (user == null)
         {
             return new ErrorDataResult<User>(Messages.UserNotFound);
@@ -40,10 +41,9 @@ public class UserManager : IUserService
         return new SuccessDataResult<User>(user, Messages.UserFound);
     }
 
-    [SecuredOperation("user.get,admin,editor,user")]
-    public IDataResult<User> GetByFirstName(string firstName)
+    public IDataResult<User> GetByMail(string mail, bool withDeleted = false)
     {
-        User user = _userDal.Get(g => g.FirstName == firstName);
+        User user = _userDal.Get(g => g.Email == mail && (withDeleted || !g.IsDeleted));
         if (user == null)
         {
             return new ErrorDataResult<User>(Messages.UserNotFound);
@@ -52,10 +52,9 @@ public class UserManager : IUserService
         return new SuccessDataResult<User>(user, Messages.UserFound);
     }
 
-    [SecuredOperation("user.get,admin,editor,user")]
-    public IDataResult<User> GetByLastName(string lastName)
+    public IDataResult<User> GetByUserName(string userName, bool withDeleted = false)
     {
-        User user = _userDal.Get(g => g.LastName == lastName);
+        User user = _userDal.Get(g => g.UserName == userName && (withDeleted || !g.IsDeleted));
         if (user == null)
         {
             return new ErrorDataResult<User>(Messages.UserNotFound);
@@ -64,28 +63,7 @@ public class UserManager : IUserService
         return new SuccessDataResult<User>(user, Messages.UserFound);
     }
 
-    public IDataResult<User> GetByMail(string mail)
-    {
-        User user = _userDal.Get(g => g.Email == mail);
-        if (user == null)
-        {
-            return new ErrorDataResult<User>(Messages.UserNotFound);
-        }
-
-        return new SuccessDataResult<User>(user, Messages.UserFound);
-    }
-
-    public IDataResult<User> GetByUserName(string userName)
-    {
-        User user = _userDal.Get(g => g.UserName == userName);
-        if (user == null)
-        {
-            return new ErrorDataResult<User>(Messages.UserNotFound);
-        }
-
-        return new SuccessDataResult<User>(user, Messages.UserFound);
-    }
-
+    [TransactionScopeAspect]
     public IResult Add(User user)
     {
         if (user.UserId == null)
@@ -97,6 +75,7 @@ public class UserManager : IUserService
         return new SuccessResult(Messages.UserCreated);
     }
 
+    [TransactionScopeAspect]
     [SecuredOperation("user.update,admin,editor,user")]
     public IResult Update(User user)
     {
@@ -104,12 +83,32 @@ public class UserManager : IUserService
         return new SuccessResult(Messages.UserUpdated);
     }
 
-    public IDataResult<List<OperationClaim>> GetClaims(User user)
+    public IResult Delete(Guid userId, bool permanently = false)
     {
-        var result = _userDal.GetClaims(user);
-        if (result.Count != null)
+        User user = _userDal.Get(user => user.UserId == userId);
+        if (user != null)
         {
-            return new SuccessDataResult<List<OperationClaim>>(result);
+            if (!permanently)
+            {
+                user.IsDeleted = true;
+                user.DeleteTime = DateTime.UtcNow;
+                _userDal.Update(user);
+                return new SuccessResult(Messages.UserDeleted);
+            }
+
+            _userDal.Delete(user);
+            return new SuccessResult(Messages.UserDeletedPermanently);
+        }
+
+        return new ErrorResult(Messages.UserNotFound);
+    }
+
+    public IDataResult<List<OperationClaim>> GetClaims(User user, bool withDeleted = false)
+    {
+        List<OperationClaim> results = _userDal.GetClaims(user, withDeleted);
+        if (results.Count != null)
+        {
+            return new SuccessDataResult<List<OperationClaim>>(results);
         }
 
         return new ErrorDataResult<List<OperationClaim>>(Messages.ClaimsNotFound);

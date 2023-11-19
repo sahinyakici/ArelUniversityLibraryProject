@@ -1,5 +1,6 @@
 ﻿using Business.Abstract;
 using Business.Constants;
+using Core.Aspects.Autofac.Caching;
 using Core.Entities.Concrete;
 using Core.Utilities.Results.Abstract;
 using Core.Utilities.Results.Concrete;
@@ -16,6 +17,7 @@ public class OperationClaimManager : IOperationClaimService
         _operationClaimDal = operationClaimDal;
     }
 
+    [CacheAspect]
     public IDataResult<OperationClaim> GetByName(string name)
     {
         var result = _operationClaimDal.Get(oper => oper.Name == name);

@@ -5,9 +5,10 @@ namespace Business.Abstract;
 
 public interface IGenreService
 {
-    IDataResult<List<Genre>> GetAll();
-    IDataResult<Genre> GetById(Guid genreId);
-    IDataResult<Genre> GetByName(string genreName);
+    IDataResult<List<Genre>> GetAll(bool withDeleted = false);
+    IDataResult<Genre> GetById(Guid genreId, bool withDeleted = false);
+    IDataResult<Genre> GetByName(string genreName, bool withDeleted = false);
     IResult Add(Genre genre);
     IResult Update(Genre genre);
+    IResult Delete(Guid genreId, bool permanently = false);
 }

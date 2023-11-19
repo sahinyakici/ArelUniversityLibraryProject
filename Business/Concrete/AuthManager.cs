@@ -2,6 +2,7 @@
 using Business.Abstract;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Transaction;
 using Core.Aspects.Autofac.Validation;
 using Core.Entities;
 using Core.Entities.Concrete;
@@ -31,11 +32,17 @@ public class AuthManager : IAuthService
     }
 
     [ValidationAspect(typeof(UserRegisterValidator))]
+    [TransactionScopeAspect]
     public IDataResult<User> Register(UserForRegisterDto userForRegisterDto)
     {
         User user = _mapper.Map<User>(userForRegisterDto);
         _userService.Add(user);
-        BusinessRules.Run(AddClaimsForUser(user.UserName));
+        IResult businessRuleResult = BusinessRules.Run(AddClaimsForUser(user.UserName));
+        if (businessRuleResult != null)
+        {
+            return new ErrorDataResult<User>(businessRuleResult.Message);
+        }
+
         return new SuccessDataResult<User>(user, Messages.UserRegistered);
     }
 
@@ -74,9 +81,9 @@ public class AuthManager : IAuthService
         return new SuccessResult();
     }
 
-    public IDataResult<AccessToken> CreateAccessToken(User user)
+    public IDataResult<AccessToken> CreateAccessToken(User user, bool withDeleted = false)
     {
-        var result = _userService.GetClaims(user);
+        var result = _userService.GetClaims(user, withDeleted);
         if (result.Success)
         {
             List<OperationClaim> claims = result.Data;
@@ -96,7 +103,6 @@ public class AuthManager : IAuthService
     {
         UserOperationClaimDto userOperationClaimDto = new UserOperationClaimDto
             { UserName = userName, OperationName = "user" };
-        _userOperationClaimService.Add(userOperationClaimDto);
-        return new SuccessResult();
+        return _userOperationClaimService.Add(userOperationClaimDto);
     }
 }
