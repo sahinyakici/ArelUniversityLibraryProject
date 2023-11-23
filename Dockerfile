@@ -5,9 +5,9 @@ COPY . .
 
 RUN dotnet publish -c Release -o out
 
-FROM mcr.microsoft.com/dotnet/runtime:7.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
 WORKDIR /app
 
 COPY --from=build /app/out .
 
-ENTRYPOINT ["dotnet", "LibraryBackend.dll"]
+ENTRYPOINT ["dotnet", "WebAPI.dll"]
