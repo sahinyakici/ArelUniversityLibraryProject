@@ -7,7 +7,9 @@ using Core.Utilities.IoC;
 using Core.Utilities.Logging;
 using Core.Utilities.Security.Encryption;
 using Core.Utilities.Security.Jwt;
+using DataAccess.Concrete.EntityFramework;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 
@@ -56,6 +58,12 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+
+using (var context = new PostgreContext())
+{
+    //context.Database.EnsureCreated();
+    context.Database.Migrate();
 }
 
 app.UseHttpsRedirection();
