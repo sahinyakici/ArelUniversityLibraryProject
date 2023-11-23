@@ -3,7 +3,6 @@ using System;
 using DataAccess.Concrete.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,11 +11,9 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(PostgreContext))]
-    [Migration("20231123082443_Initial")]
-    partial class Initial
+    partial class PostgreContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,6 +35,83 @@ namespace DataAccess.Migrations
                     b.HasKey("OperationClaimId");
 
                     b.ToTable("OperationClaims");
+
+                    b.HasData(
+                        new
+                        {
+                            OperationClaimId = new Guid("471e1977-9cd4-4dcc-acc7-75f2540b35e9"),
+                            Name = "admin"
+                        },
+                        new
+                        {
+                            OperationClaimId = new Guid("849e633a-c4af-4068-a5b6-b2006c4a45c9"),
+                            Name = "user"
+                        },
+                        new
+                        {
+                            OperationClaimId = new Guid("e1881245-88a8-428e-8eaf-5d6a06e8e68f"),
+                            Name = "editor"
+                        },
+                        new
+                        {
+                            OperationClaimId = new Guid("45f1369e-ebd5-4921-8527-d965e60626e6"),
+                            Name = "books.add"
+                        },
+                        new
+                        {
+                            OperationClaimId = new Guid("28db5a5c-041b-4769-8996-b6ffa2fd889a"),
+                            Name = "books.edit"
+                        },
+                        new
+                        {
+                            OperationClaimId = new Guid("a6709e32-1ff1-4afa-a1cd-a93c849d5d78"),
+                            Name = "books.delete"
+                        },
+                        new
+                        {
+                            OperationClaimId = new Guid("4e219b13-dd02-4c4e-b8fc-357d626392ac"),
+                            Name = "books.update"
+                        },
+                        new
+                        {
+                            OperationClaimId = new Guid("f473106b-ba6e-474e-87ab-387f59bee5a5"),
+                            Name = "authors.add"
+                        },
+                        new
+                        {
+                            OperationClaimId = new Guid("c10a5389-e286-42e4-bba7-615282cb7b3a"),
+                            Name = "authors.edit"
+                        },
+                        new
+                        {
+                            OperationClaimId = new Guid("8a52997d-0c7f-4580-b906-cc8f5836ca09"),
+                            Name = "authors.delete"
+                        },
+                        new
+                        {
+                            OperationClaimId = new Guid("776d8987-894a-4125-afb7-df3566da113a"),
+                            Name = "authors.update"
+                        },
+                        new
+                        {
+                            OperationClaimId = new Guid("3f2d21ab-6d7b-42fa-90da-feb63cf678b0"),
+                            Name = "genres.add"
+                        },
+                        new
+                        {
+                            OperationClaimId = new Guid("8eac9a4c-5bda-4f9b-8076-3052a9ad8de1"),
+                            Name = "genres.edit"
+                        },
+                        new
+                        {
+                            OperationClaimId = new Guid("e912c841-0868-40e5-a347-7d2b46fe1388"),
+                            Name = "genres.delete"
+                        },
+                        new
+                        {
+                            OperationClaimId = new Guid("adc96964-2d27-4fa6-8ae2-61e5b79733da"),
+                            Name = "genres.update"
+                        });
                 });
 
             modelBuilder.Entity("Core.Entities.Concrete.User", b =>

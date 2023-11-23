@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class version1migration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -122,6 +124,28 @@ namespace DataAccess.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.UserId);
+                });
+
+            migrationBuilder.InsertData(
+                table: "OperationClaims",
+                columns: new[] { "OperationClaimId", "Name" },
+                values: new object[,]
+                {
+                    { new Guid("28db5a5c-041b-4769-8996-b6ffa2fd889a"), "books.edit" },
+                    { new Guid("3f2d21ab-6d7b-42fa-90da-feb63cf678b0"), "genres.add" },
+                    { new Guid("45f1369e-ebd5-4921-8527-d965e60626e6"), "books.add" },
+                    { new Guid("471e1977-9cd4-4dcc-acc7-75f2540b35e9"), "admin" },
+                    { new Guid("4e219b13-dd02-4c4e-b8fc-357d626392ac"), "books.update" },
+                    { new Guid("776d8987-894a-4125-afb7-df3566da113a"), "authors.update" },
+                    { new Guid("849e633a-c4af-4068-a5b6-b2006c4a45c9"), "user" },
+                    { new Guid("8a52997d-0c7f-4580-b906-cc8f5836ca09"), "authors.delete" },
+                    { new Guid("8eac9a4c-5bda-4f9b-8076-3052a9ad8de1"), "genres.edit" },
+                    { new Guid("a6709e32-1ff1-4afa-a1cd-a93c849d5d78"), "books.delete" },
+                    { new Guid("adc96964-2d27-4fa6-8ae2-61e5b79733da"), "genres.update" },
+                    { new Guid("c10a5389-e286-42e4-bba7-615282cb7b3a"), "authors.edit" },
+                    { new Guid("e1881245-88a8-428e-8eaf-5d6a06e8e68f"), "editor" },
+                    { new Guid("e912c841-0868-40e5-a347-7d2b46fe1388"), "genres.delete" },
+                    { new Guid("f473106b-ba6e-474e-87ab-387f59bee5a5"), "authors.add" }
                 });
         }
 
