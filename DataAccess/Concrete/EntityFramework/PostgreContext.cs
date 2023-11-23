@@ -33,4 +33,27 @@ public class PostgreContext : DbContext
             optionsBuilder.UseNpgsql(defaultConnection);
         }
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        OperationClaim[] operationClaims = new[]
+        {
+            new OperationClaim { OperationClaimId = Guid.NewGuid(), Name = "admin" },
+            new OperationClaim { OperationClaimId = Guid.NewGuid(), Name = "user" },
+            new OperationClaim { OperationClaimId = Guid.NewGuid(), Name = "editor" },
+            new OperationClaim { OperationClaimId = Guid.NewGuid(), Name = "books.add" },
+            new OperationClaim { OperationClaimId = Guid.NewGuid(), Name = "books.edit" },
+            new OperationClaim { OperationClaimId = Guid.NewGuid(), Name = "books.delete" },
+            new OperationClaim { OperationClaimId = Guid.NewGuid(), Name = "books.update" },
+            new OperationClaim { OperationClaimId = Guid.NewGuid(), Name = "authors.add" },
+            new OperationClaim { OperationClaimId = Guid.NewGuid(), Name = "authors.edit" },
+            new OperationClaim { OperationClaimId = Guid.NewGuid(), Name = "authors.delete" },
+            new OperationClaim { OperationClaimId = Guid.NewGuid(), Name = "authors.update" },
+            new OperationClaim { OperationClaimId = Guid.NewGuid(), Name = "genres.add" },
+            new OperationClaim { OperationClaimId = Guid.NewGuid(), Name = "genres.edit" },
+            new OperationClaim { OperationClaimId = Guid.NewGuid(), Name = "genres.delete" },
+            new OperationClaim { OperationClaimId = Guid.NewGuid(), Name = "genres.update" }
+        };
+        var test = modelBuilder.Entity<OperationClaim>().HasData(operationClaims);
+    }
 }

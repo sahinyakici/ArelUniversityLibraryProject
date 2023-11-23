@@ -62,8 +62,10 @@ if (app.Environment.IsDevelopment())
 
 using (var context = new PostgreContext())
 {
-    //context.Database.EnsureCreated();
-    context.Database.Migrate();
+    if (!context.Database.GetAppliedMigrations().Any())
+    {
+        context.Database.Migrate();
+    }
 }
 
 app.UseHttpsRedirection();
