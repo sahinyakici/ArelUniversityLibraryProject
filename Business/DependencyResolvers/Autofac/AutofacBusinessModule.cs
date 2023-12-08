@@ -43,6 +43,8 @@ public class AutofacBusinessModule : Module
         builder.RegisterType<AuthorNameResolver>().AsSelf().SingleInstance();
         builder.RegisterType<AuthorIdResolver>().AsSelf().SingleInstance();
 
+        builder.RegisterType<GenreBookCountResolver>().AsSelf().SingleInstance();
+
         builder.RegisterType<UserNameResolver>().AsSelf().SingleInstance();
         builder.RegisterType<UserIdResolver>().AsSelf().SingleInstance();
 

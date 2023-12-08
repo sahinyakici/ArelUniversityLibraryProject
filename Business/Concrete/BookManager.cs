@@ -48,6 +48,14 @@ public class BookManager : IBookService
         return new ErrorDataResult<List<Book>>(Messages.BooksNotListed);
     }
 
+    [CacheAspect]
+    [PerformanceAspect(10)]
+    public IDataResult<List<Book>> GetAllNotRented(bool withDeleted = false)
+    {
+        List<Book> books = _bookDal.GetAll(book => book.RentStatus == false && (withDeleted || !book.IsDeleted));
+        return new SuccessDataResult<List<Book>>(books);
+    }
+
     [ValidationAspect(typeof(BookDtoValidator))]
     [SecuredOperation("books.add,admin,editor,user")]
     [CacheRemoveAspect("IBookService.Get")]
@@ -97,7 +105,7 @@ public class BookManager : IBookService
     [PerformanceAspect(5)]
     public IDataResult<List<Book>> GetAllByGenre(Guid genreId, bool withDelete = false)
     {
-        List<Book> books = _bookDal.GetAll(b => b.GenreId == genreId && (withDelete || !b.IsDeleted == withDelete));
+        List<Book> books = _bookDal.GetAll(b => b.GenreId == genreId && (withDelete || !b.IsDeleted));
         if (books != null)
         {
             return new SuccessDataResult<List<Book>>(books, Messages.BooksListed);

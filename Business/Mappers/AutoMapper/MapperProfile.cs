@@ -51,5 +51,8 @@ public class MapperProfile : Profile
         CreateMap<RentalDTO, Rental>()
             .ForMember(dest => dest.BookId, opt => opt.MapFrom<RentalDtoBookIdResolver>())
             .ForMember(dest => dest.UserId, opt => opt.MapFrom<RentalDtoUserIdResolver>());
+
+        CreateMap<Genre, GenreDTO>()
+            .ForMember(dest => dest.BookCount, opt => opt.MapFrom<GenreBookCountResolver>());
     }
 }
