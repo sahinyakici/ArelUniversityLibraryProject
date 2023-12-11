@@ -1,5 +1,8 @@
+using AutoMapper;
 using Business.Abstract;
+using Core.Utilities.Results.Concrete;
 using Entities.Concrete;
+using Entities.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
@@ -9,10 +12,12 @@ namespace WebAPI.Controllers
     public class GenresController : ControllerBase
     {
         private IGenreService _genreService;
+        private readonly IMapper _mapper;
 
-        public GenresController(IGenreService genreService)
+        public GenresController(IGenreService genreService, IMapper mapper)
         {
             _genreService = genreService;
+            _mapper = mapper;
         }
 
         [HttpGet("GetAll")]
@@ -21,7 +26,25 @@ namespace WebAPI.Controllers
             var result = _genreService.GetAll(withDeleted);
             if (result.Success)
             {
-                return Ok(result);
+                List<Genre> genres = result.Data;
+                List<GenreDTO> genreDtos = genres.Select(genre => _mapper.Map<GenreDTO>(genre)).ToList();
+
+                return Ok(new SuccessDataResult<List<GenreDTO>>(genreDtos));
+            }
+
+            return BadRequest(result.Message);
+        }
+
+        [HttpGet("getallwithcount")]
+        public ActionResult GetAllWithCount(bool withDeleted)
+        {
+            var result = _genreService.GetAll(withDeleted);
+            if (result.Success)
+            {
+                List<Genre> genres = result.Data;
+                List<GenreDTO> genreDtos = genres.Select(genre => _mapper.Map<GenreDTO>(genre)).ToList();
+
+                return Ok(new SuccessDataResult<List<GenreDTO>>(genreDtos));
             }
 
             return BadRequest(result.Message);
@@ -33,7 +56,9 @@ namespace WebAPI.Controllers
             var result = _genreService.GetById(guid, withDeleted);
             if (result.Success)
             {
-                return Ok(result);
+                Genre genre = result.Data;
+                GenreDTO genreDTO = _mapper.Map<GenreDTO>(genre);
+                return Ok(genreDTO);
             }
 
             return BadRequest(result.Message);

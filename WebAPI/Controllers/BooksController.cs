@@ -1,5 +1,6 @@
 using AutoMapper;
 using Business.Abstract;
+using Core.Utilities.Results.Concrete;
 using Entities.Concrete;
 using Entities.DTOs;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +28,7 @@ namespace WebAPI.Controllers
             {
                 List<Book> books = result.Data;
                 List<BookDTO> resultBookDetailDto = books.Select(book => _mapper.Map<BookDTO>(book)).ToList();
-                return Ok(resultBookDetailDto);
+                return Ok(new SuccessDataResult<List<BookDTO>>(resultBookDetailDto));
             }
 
             return BadRequest(result.Message);
@@ -41,7 +42,7 @@ namespace WebAPI.Controllers
             {
                 Book book = result.Data;
                 BookDTO bookDto = _mapper.Map<BookDTO>(book);
-                return Ok(bookDto);
+                return Ok(new SuccessDataResult<BookDTO>(bookDto));
             }
 
             return BadRequest(result.Message);
@@ -67,7 +68,7 @@ namespace WebAPI.Controllers
             {
                 List<Book> books = result.Data;
                 List<BookDTO> bookDtos = books.Select(book => _mapper.Map<BookDTO>(book)).ToList();
-                return Ok(bookDtos);
+                return Ok(new SuccessDataResult<List<BookDTO>>(bookDtos));
             }
 
             return BadRequest(result.Message);
@@ -81,7 +82,7 @@ namespace WebAPI.Controllers
             {
                 List<Book> books = result.Data;
                 List<BookDTO> bookDtos = books.Select(book => _mapper.Map<BookDTO>(book)).ToList();
-                return Ok(bookDtos);
+                return Ok(new SuccessDataResult<List<BookDTO>>(bookDtos));
             }
 
             return BadRequest(result.Message);
@@ -97,6 +98,20 @@ namespace WebAPI.Controllers
             }
 
             return BadRequest(result.Message);
+        }
+
+        [HttpGet]
+        public IActionResult GetBooksWhichNotRented()
+        {
+            var result = _bookService.GetAllNotRented();
+            if (result.Success)
+            {
+                List<BookDTO> books = result.Data.Select(book => _mapper.Map<BookDTO>(book)).ToList();
+
+                return Ok(new SuccessDataResult<List<BookDTO>>(books));
+            }
+
+            return BadRequest(result);
         }
     }
 }
