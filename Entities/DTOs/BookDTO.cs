@@ -12,5 +12,6 @@ public class BookDTO : IDto
     public string Location { get; set; }
     public int PageSize { get; set; }
     public bool RentStatus { get; set; }
-    public float Money { get; set; }
+    public float? Money { get; set; }
+    public String? ImagePath { get; set; }
 }

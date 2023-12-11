@@ -6,6 +6,7 @@ using Business.Abstract;
 using Business.Concrete;
 using Business.Mappers.AutoMapper;
 using Business.Mappers.AutoMapper.Resolvers;
+using Business.Mappers.AutoMapper.Resolvers.ImageResolver;
 using Business.Mappers.AutoMapper.Resolvers.RentalResolver;
 using Business.Mappers.AutoMapper.Resolvers.UserOperationClaimResolver;
 using Business.Mappers.AutoMapper.Resolvers.UserResolver;
@@ -54,6 +55,8 @@ public class AutofacBusinessModule : Module
         builder.RegisterType<RentalDtoBookIdResolver>().AsSelf().SingleInstance();
         builder.RegisterType<RentalDtoUserIdResolver>().AsSelf().SingleInstance();
 
+        builder.RegisterType<ImagePathResolver>().AsSelf().SingleInstance();
+
         builder.RegisterType<AuthManager>().As<IAuthService>();
         builder.RegisterType<JwtHelper>().As<ITokenHelper>();
 
@@ -66,6 +69,9 @@ public class AutofacBusinessModule : Module
         builder.RegisterType<UserOperationUserIdResolver>().AsSelf().SingleInstance();
         builder.RegisterType<UserOperationClaimIdResolver>().AsSelf().SingleInstance();
         builder.RegisterType<UserOperationClaimRowIdResolver>().AsSelf().SingleInstance();
+
+        builder.RegisterType<ImageManager>().As<IImageService>().SingleInstance();
+        builder.RegisterType<EfImageDal>().As<IImageDal>().SingleInstance();
 
 
         var assembly = Assembly.GetExecutingAssembly();

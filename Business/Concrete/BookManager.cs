@@ -14,6 +14,7 @@ using Core.Utilities.Results.Concrete;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using Entities.DTOs;
+using Microsoft.Extensions.Configuration;
 
 namespace Business.Concrete;
 
@@ -24,15 +25,17 @@ public class BookManager : IBookService
     private IBookDal _bookDal;
     private IGenreService _genreService;
     private IUserService _userService;
+    private IImageService _imageService;
 
     public BookManager(IBookDal bookDal, IAuthorService authorService, IGenreService genreService, IMapper mapper,
-        IUserService userService)
+        IUserService userService, IImageService imageService)
     {
         _bookDal = bookDal;
         _authorService = authorService;
         _genreService = genreService;
         _mapper = mapper;
         _userService = userService;
+        _imageService = imageService;
     }
 
     [CacheAspect]
@@ -63,10 +66,20 @@ public class BookManager : IBookService
     [PerformanceAspect(2)]
     public IResult Add(BookDTO bookDto)
     {
-        BusinessRules.Run(CreateGenreIfNotExists(bookDto.GenreName), CreateAuthorIfNotExists(bookDto.AuthorName));
-        Book book = _mapper.Map<Book>(bookDto);
-        _bookDal.Add(book);
-        return new SuccessResult(Messages.BookAdded);
+        bookDto.BookId = Guid.NewGuid();
+        IResult results = BusinessRules.Run(CreateGenreIfNotExists(bookDto.GenreName),
+            CreateAuthorIfNotExists(bookDto.AuthorName),
+            SaveImage(bookDto.BookId, bookDto.ImagePath));
+        if (results != null)
+        {
+            return new ErrorResult(results.Message);
+        }
+        else
+        {
+            Book book = _mapper.Map<Book>(bookDto);
+            _bookDal.Add(book);
+            return new SuccessResult(Messages.BookAdded);
+        }
     }
 
     [ValidationAspect(typeof(BookDtoValidator))]
@@ -207,5 +220,51 @@ public class BookManager : IBookService
         }
 
         return new ErrorDataResult<Author>(Messages.AuthorNotFound);
+    }
+
+    private IResult SaveImage(Guid bookId, String imagePath)
+    {
+        if (imagePath == null)
+        {
+            return new SuccessResult();
+        }
+
+        IConfiguration configuration = new ConfigurationBuilder()
+            .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .Build();
+
+        try
+        {
+            if (File.Exists(imagePath))
+            {
+                string newFileName = $"{Guid.NewGuid()}{Path.GetExtension(imagePath)}";
+                string imageDirectory = configuration["ImageFolderPath"];
+                if (!Directory.Exists(imageDirectory))
+                {
+                    Directory.CreateDirectory(imageDirectory);
+                }
+
+                string destinationPath = Path.Combine(imageDirectory, newFileName);
+                File.Copy(imagePath, destinationPath);
+                Console.WriteLine($"The image has been successfully copied and renamed: {newFileName}");
+                Image image = new Image
+                {
+                    ImagePath = "assets/images/" + newFileName, IsDeleted = false, ImageId = Guid.NewGuid(),
+                    BookId = bookId
+                };
+                _imageService.Add(image);
+                return new SuccessResult();
+            }
+            else
+            {
+                return new ErrorResult(Messages.ErroFileCopy);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Hata: {ex.Message}");
+            return new ErrorResult(ex.Message);
+        }
     }
 }

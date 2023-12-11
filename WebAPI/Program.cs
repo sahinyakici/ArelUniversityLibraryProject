@@ -20,7 +20,7 @@ builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory())
     .ConfigureContainer<ContainerBuilder>(register => register.RegisterModule(new AutofacBusinessModule()));
-
+builder.Services.AddCors();
 var configuration = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json")
@@ -68,7 +68,7 @@ using (var context = new PostgreContext())
     }
 }
 
-app.UseCors(builder => builder.WithOrigins("http//localhost").AllowAnyHeader());
+app.UseCors(builder => builder.WithOrigins("http//localhost:8080").AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

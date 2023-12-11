@@ -58,4 +58,7 @@ public static class Messages
     public static string RentalNotFound = "Böyle bir kiralama bulunamadı";
     public static string UserDeleted = "Kullanıcı silindi";
     public static string UserDeletedPermanently = "Kullanıcı kalıcı olarak silindi";
+    public static string ImageDeleted = "Resim silindi";
+    public static string ImageFound = "Resim bulundu";
+    public static string ErroFileCopy = "The specified image file does not exist";
 }
