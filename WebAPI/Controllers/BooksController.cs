@@ -113,5 +113,18 @@ namespace WebAPI.Controllers
 
             return BadRequest(result);
         }
+
+        [HttpGet("getallbygenre")]
+        public IActionResult GetBooksByGenre(Guid id, bool permanently)
+        {
+            var result = _bookService.GetAllByGenre(id, permanently);
+            if (result.Success)
+            {
+                List<BookDTO> books = result.Data.Select(book => _mapper.Map<BookDTO>(book)).ToList();
+                return Ok(new SuccessDataResult<List<BookDTO>>(books));
+            }
+
+            return BadRequest(result);
+        }
     }
 }

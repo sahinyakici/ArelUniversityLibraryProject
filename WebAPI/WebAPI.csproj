@@ -28,4 +28,20 @@
         <ProjectReference Include="..\Entities\Entities.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <Compile Remove="logs\**"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Remove="logs\**"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Remove="logs\**"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="logs\**"/>
+    </ItemGroup>
+
 </Project>

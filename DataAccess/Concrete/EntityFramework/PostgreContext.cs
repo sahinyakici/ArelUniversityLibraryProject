@@ -29,6 +29,11 @@ public class PostgreContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         string defaultConnection = _configuration["ConnectionStrings:DefaultConnection"];
+        defaultConnection = string.Format(defaultConnection,
+            Environment.GetEnvironmentVariable("LIBRARY_DATABASE_SERVER"),
+            Environment.GetEnvironmentVariable("LIBRARY_POSTGRES_DB"),
+            Environment.GetEnvironmentVariable("LIBRARY_POSTGRES_USER"),
+            Environment.GetEnvironmentVariable("LIBRARY_POSTGRES_PASSWORD"));
         if (defaultConnection != null)
         {
             optionsBuilder.UseNpgsql(defaultConnection);
