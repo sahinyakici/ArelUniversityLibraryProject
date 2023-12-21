@@ -256,37 +256,5 @@ public class BookManager : IBookService
         _imageService.Add(image);
 
         return new SuccessResult();
-        // try
-        // {
-        //     if (File.Exists(imageFile))
-        //     {
-        //         string newFileName = $"{Guid.NewGuid()}{Path.GetExtension(imageFile)}";
-        //         string imageDirectory = configuration["ImageFolderPath"];
-        //         if (!Directory.Exists(imageDirectory))
-        //         {
-        //             Directory.CreateDirectory(imageDirectory);
-        //         }
-        //
-        //         string destinationPath = Path.Combine(imageDirectory, newFileName);
-        //         File.Copy(imageFile, destinationPath);
-        //         Console.WriteLine($"The image has been successfully copied and renamed: {newFileName}");
-        //         Image image = new Image
-        //         {
-        //             ImagePath = "assets/images/" + newFileName, IsDeleted = false, ImageId = Guid.NewGuid(),
-        //             BookId = bookId
-        //         };
-        //         _imageService.Add(image);
-        //         return new SuccessResult();
-        //     }
-        //     else
-        //     {
-        //         return new ErrorResult(Messages.ErroFileCopy);
-        //     }
-        // }
-        // catch (Exception ex)
-        // {
-        //     Console.WriteLine($"Hata: {ex.Message}");
-        //     return new ErrorResult(ex.Message);
-        // }
     }
 }
