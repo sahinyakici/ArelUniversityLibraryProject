@@ -7,7 +7,9 @@ using Core.Utilities.IoC;
 using Core.Utilities.Logging;
 using Core.Utilities.Security.Encryption;
 using Core.Utilities.Security.Jwt;
+using DataAccess.Concrete.EntityFramework;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 
@@ -18,12 +20,12 @@ builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory())
     .ConfigureContainer<ContainerBuilder>(register => register.RegisterModule(new AutofacBusinessModule()));
-
+builder.Services.AddCors();
 var configuration = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json")
     .Build();
-
+builder.Services.AddCors();
 var tokenOptions = configuration.GetSection("TokenOptions").Get<TokenOptions>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(
@@ -58,6 +60,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+using (var context = new PostgreContext())
+{
+    if (!context.Database.GetAppliedMigrations().Any())
+    {
+        context.Database.Migrate();
+    }
+}
+
+app.ConfigureCustomExceptionMiddleware();
+app.UseCors(builder => builder.WithOrigins("http//localhost:8080").AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

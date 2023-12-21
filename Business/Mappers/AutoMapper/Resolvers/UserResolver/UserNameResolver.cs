@@ -21,7 +21,8 @@ public class UserNameResolver : IValueResolver<Book, BookDTO, string>
         IDataResult<User> result = _userService.GetById(source.OwnerId);
         if (result.Success)
         {
-            return result.Data.UserName;
+            string ownerFullName = $"{result.Data.FirstName} {result.Data.LastName}";
+            return ownerFullName;
         }
 
         return result.Message;

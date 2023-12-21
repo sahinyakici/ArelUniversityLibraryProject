@@ -13,6 +13,7 @@ public class Book : IEntity, IDeleted
     public string Location { get; set; }
     public int PageSize { get; set; }
     public bool RentStatus { get; set; }
+    public float Money { get; set; }
     public bool IsDeleted { get; set; }
     public DateTime? DeleteTime { get; set; }
 }

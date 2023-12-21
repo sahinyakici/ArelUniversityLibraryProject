@@ -14,6 +14,8 @@ using Core.Utilities.Results.Concrete;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using Entities.DTOs;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 
 namespace Business.Concrete;
 
@@ -24,15 +26,17 @@ public class BookManager : IBookService
     private IBookDal _bookDal;
     private IGenreService _genreService;
     private IUserService _userService;
+    private IImageService _imageService;
 
     public BookManager(IBookDal bookDal, IAuthorService authorService, IGenreService genreService, IMapper mapper,
-        IUserService userService)
+        IUserService userService, IImageService imageService)
     {
         _bookDal = bookDal;
         _authorService = authorService;
         _genreService = genreService;
         _mapper = mapper;
         _userService = userService;
+        _imageService = imageService;
     }
 
     [CacheAspect]
@@ -48,17 +52,35 @@ public class BookManager : IBookService
         return new ErrorDataResult<List<Book>>(Messages.BooksNotListed);
     }
 
+    [CacheAspect]
+    [PerformanceAspect(10)]
+    public IDataResult<List<Book>> GetAllNotRented(bool withDeleted = false)
+    {
+        List<Book> books = _bookDal.GetAll(book => book.RentStatus == false && (withDeleted || !book.IsDeleted));
+        return new SuccessDataResult<List<Book>>(books);
+    }
+
     [ValidationAspect(typeof(BookDtoValidator))]
     [SecuredOperation("books.add,admin,editor,user")]
     [CacheRemoveAspect("IBookService.Get")]
     [TransactionScopeAspect]
     [PerformanceAspect(2)]
-    public IResult Add(BookDTO bookDto)
+    public IResult Add(BookDTO bookDto, IFormFile? image)
     {
-        BusinessRules.Run(CreateGenreIfNotExists(bookDto.GenreName), CreateAuthorIfNotExists(bookDto.AuthorName));
-        Book book = _mapper.Map<Book>(bookDto);
-        _bookDal.Add(book);
-        return new SuccessResult(Messages.BookAdded);
+        bookDto.BookId = Guid.NewGuid();
+        IResult results = BusinessRules.Run(CreateGenreIfNotExists(bookDto.GenreName),
+            CreateAuthorIfNotExists(bookDto.AuthorName),
+            SaveImage(bookDto.BookId, image));
+        if (results != null)
+        {
+            return new ErrorResult(results.Message);
+        }
+        else
+        {
+            Book book = _mapper.Map<Book>(bookDto);
+            _bookDal.Add(book);
+            return new SuccessResult(Messages.BookAdded);
+        }
     }
 
     [ValidationAspect(typeof(BookDtoValidator))]
@@ -97,7 +119,7 @@ public class BookManager : IBookService
     [PerformanceAspect(5)]
     public IDataResult<List<Book>> GetAllByGenre(Guid genreId, bool withDelete = false)
     {
-        List<Book> books = _bookDal.GetAll(b => b.GenreId == genreId && (withDelete || !b.IsDeleted == withDelete));
+        List<Book> books = _bookDal.GetAll(b => b.GenreId == genreId && (withDelete || !b.IsDeleted));
         if (books != null)
         {
             return new SuccessDataResult<List<Book>>(books, Messages.BooksListed);
@@ -199,5 +221,40 @@ public class BookManager : IBookService
         }
 
         return new ErrorDataResult<Author>(Messages.AuthorNotFound);
+    }
+
+    private IResult SaveImage(Guid bookId, IFormFile? imageFile)
+    {
+        if (imageFile == null || imageFile.Length == 0)
+        {
+            return new SuccessResult();
+        }
+
+        IConfiguration configuration = new ConfigurationBuilder()
+            .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .Build();
+
+        string imageDirectory = configuration["ImageFolderPath"];
+        if (!Directory.Exists(imageDirectory))
+        {
+            Directory.CreateDirectory(imageDirectory);
+        }
+
+        string newFileName = $"{Guid.NewGuid()}{Path.GetExtension(imageFile.FileName)}";
+        var filePath = Path.Combine(imageDirectory, newFileName);
+        using (var fileStream = new FileStream(filePath, FileMode.Create))
+        {
+            imageFile.CopyToAsync(fileStream);
+        }
+
+        Image image = new Image
+        {
+            ImagePath = "assets/images/" + newFileName, IsDeleted = false, ImageId = Guid.NewGuid(),
+            BookId = bookId
+        };
+        _imageService.Add(image);
+
+        return new SuccessResult();
     }
 }
