@@ -1,6 +1,8 @@
 using AutoMapper;
 using Business.Abstract;
+using Core.Utilities.Results.Concrete;
 using Entities.Concrete;
+using Entities.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
@@ -24,7 +26,8 @@ namespace WebAPI.Controllers
             var result = _authorManager.GetAll(withDeleted);
             if (result.Success)
             {
-                return Ok(result.Data);
+                List<AuthorDTO> authorDTOs = result.Data.Select(author => _mapper.Map<AuthorDTO>(author)).ToList();
+                return Ok(new SuccessDataResult<List<AuthorDTO>>(authorDTOs));
             }
 
             return BadRequest(result.Message);

@@ -16,10 +16,7 @@ public class GenreIdResolver : IValueResolver<BookDTO, Book, Guid>
 
     public Guid Resolve(BookDTO source, Book destination, Guid destMember, ResolutionContext context)
     {
-        Genre genre = _genreService.GetAll().Data
-            .Where(g => string.Equals(g.GenreName, source.GenreName, StringComparison.OrdinalIgnoreCase))
-            .SingleOrDefault();
-
-        return genre.GenreId;
+        var result = _genreService.GetByName(source.GenreName);
+        return result.Data.GenreId;
     }
 }

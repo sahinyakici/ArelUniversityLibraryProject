@@ -10,6 +10,5 @@ public class GenreValidator : AbstractValidator<Genre>
         RuleFor(genre => genre.GenreName).NotNull();
         RuleFor(genre => genre.GenreName).NotEmpty();
         RuleFor(genre => genre.GenreName).MinimumLength(3);
-        RuleFor(genre => genre.GenreName).MaximumLength(15);
     }
 }

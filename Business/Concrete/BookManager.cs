@@ -14,6 +14,7 @@ using Core.Utilities.Results.Concrete;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using Entities.DTOs;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 
 namespace Business.Concrete;
@@ -64,12 +65,12 @@ public class BookManager : IBookService
     [CacheRemoveAspect("IBookService.Get")]
     [TransactionScopeAspect]
     [PerformanceAspect(2)]
-    public IResult Add(BookDTO bookDto)
+    public IResult Add(BookDTO bookDto, IFormFile? image)
     {
         bookDto.BookId = Guid.NewGuid();
         IResult results = BusinessRules.Run(CreateGenreIfNotExists(bookDto.GenreName),
             CreateAuthorIfNotExists(bookDto.AuthorName),
-            SaveImage(bookDto.BookId, bookDto.ImagePath));
+            SaveImage(bookDto.BookId, image));
         if (results != null)
         {
             return new ErrorResult(results.Message);
@@ -222,9 +223,9 @@ public class BookManager : IBookService
         return new ErrorDataResult<Author>(Messages.AuthorNotFound);
     }
 
-    private IResult SaveImage(Guid bookId, String imagePath)
+    private IResult SaveImage(Guid bookId, IFormFile? imageFile)
     {
-        if (imagePath == null)
+        if (imageFile == null || imageFile.Length == 0)
         {
             return new SuccessResult();
         }
@@ -234,37 +235,58 @@ public class BookManager : IBookService
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
             .Build();
 
-        try
+        string imageDirectory = configuration["ImageFolderPath"];
+        if (!Directory.Exists(imageDirectory))
         {
-            if (File.Exists(imagePath))
-            {
-                string newFileName = $"{Guid.NewGuid()}{Path.GetExtension(imagePath)}";
-                string imageDirectory = configuration["ImageFolderPath"];
-                if (!Directory.Exists(imageDirectory))
-                {
-                    Directory.CreateDirectory(imageDirectory);
-                }
+            Directory.CreateDirectory(imageDirectory);
+        }
 
-                string destinationPath = Path.Combine(imageDirectory, newFileName);
-                File.Copy(imagePath, destinationPath);
-                Console.WriteLine($"The image has been successfully copied and renamed: {newFileName}");
-                Image image = new Image
-                {
-                    ImagePath = "assets/images/" + newFileName, IsDeleted = false, ImageId = Guid.NewGuid(),
-                    BookId = bookId
-                };
-                _imageService.Add(image);
-                return new SuccessResult();
-            }
-            else
-            {
-                return new ErrorResult(Messages.ErroFileCopy);
-            }
-        }
-        catch (Exception ex)
+        string newFileName = $"{Guid.NewGuid()}{Path.GetExtension(imageFile.FileName)}";
+        var filePath = Path.Combine(imageDirectory, newFileName);
+        using (var fileStream = new FileStream(filePath, FileMode.Create))
         {
-            Console.WriteLine($"Hata: {ex.Message}");
-            return new ErrorResult(ex.Message);
+            imageFile.CopyToAsync(fileStream);
         }
+
+        Image image = new Image
+        {
+            ImagePath = "assets/images/" + newFileName, IsDeleted = false, ImageId = Guid.NewGuid(),
+            BookId = bookId
+        };
+        _imageService.Add(image);
+
+        return new SuccessResult();
+        // try
+        // {
+        //     if (File.Exists(imageFile))
+        //     {
+        //         string newFileName = $"{Guid.NewGuid()}{Path.GetExtension(imageFile)}";
+        //         string imageDirectory = configuration["ImageFolderPath"];
+        //         if (!Directory.Exists(imageDirectory))
+        //         {
+        //             Directory.CreateDirectory(imageDirectory);
+        //         }
+        //
+        //         string destinationPath = Path.Combine(imageDirectory, newFileName);
+        //         File.Copy(imageFile, destinationPath);
+        //         Console.WriteLine($"The image has been successfully copied and renamed: {newFileName}");
+        //         Image image = new Image
+        //         {
+        //             ImagePath = "assets/images/" + newFileName, IsDeleted = false, ImageId = Guid.NewGuid(),
+        //             BookId = bookId
+        //         };
+        //         _imageService.Add(image);
+        //         return new SuccessResult();
+        //     }
+        //     else
+        //     {
+        //         return new ErrorResult(Messages.ErroFileCopy);
+        //     }
+        // }
+        // catch (Exception ex)
+        // {
+        //     Console.WriteLine($"Hata: {ex.Message}");
+        //     return new ErrorResult(ex.Message);
+        // }
     }
 }

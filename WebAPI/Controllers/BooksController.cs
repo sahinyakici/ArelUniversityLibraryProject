@@ -49,9 +49,14 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost("Add")]
-        public IActionResult Add(BookDTO bookDto)
+        public IActionResult Add([FromForm] BookDTO bookDto, IFormFile? image)
         {
-            var result = _bookService.Add(bookDto);
+            if (image == null)
+            {
+                image = new FormFile(Stream.Null, 0, 0, "image", "empty.jpg");
+            }
+
+            var result = _bookService.Add(bookDto, image);
             if (result.Success)
             {
                 return Ok(result);
