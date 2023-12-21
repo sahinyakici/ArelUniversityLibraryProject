@@ -68,6 +68,7 @@ using (var context = new PostgreContext())
     }
 }
 
+app.ConfigureCustomExceptionMiddleware();
 app.UseCors(builder => builder.WithOrigins("http//localhost:8080").AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 app.UseHttpsRedirection();
 app.UseAuthentication();

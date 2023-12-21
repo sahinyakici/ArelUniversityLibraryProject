@@ -55,5 +55,6 @@ public class MapperProfile : Profile
 
         CreateMap<Genre, GenreDTO>()
             .ForMember(dest => dest.BookCount, opt => opt.MapFrom<GenreBookCountResolver>());
+        CreateMap<Author, AuthorDTO>().ReverseMap();
     }
 }
