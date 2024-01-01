@@ -1,5 +1,5 @@
 ﻿namespace Core.Entities;
 
-public interface IDto
+public record IDto
 {
 }

@@ -10,7 +10,7 @@ public interface IBookService
     IDataResult<List<Book>> GetAll(bool withDelete = false);
     IDataResult<List<Book>> GetAllNotRented(bool withDeleted = false);
     IResult Add(BookDTO bookDto, IFormFile? image);
-    IResult Update(Book book);
+    IResult Update(BookDTO book);
     IResult Delete(Guid id, bool permanently = false);
     IDataResult<List<Book>> GetAllByGenre(Guid genreId, bool withDelete = false);
     IDataResult<List<Book>> GetAllByAuthorName(string authorName, bool withDelete = false);

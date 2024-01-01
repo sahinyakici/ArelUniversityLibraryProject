@@ -44,4 +44,8 @@
         <None Remove="logs\**"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <Folder Include="users_books_pictures\"/>
+    </ItemGroup>
+
 </Project>

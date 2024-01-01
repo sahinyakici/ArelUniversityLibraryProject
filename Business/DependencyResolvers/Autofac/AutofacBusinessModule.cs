@@ -55,6 +55,8 @@ public class AutofacBusinessModule : Module
         builder.RegisterType<RentalDtoBookIdResolver>().AsSelf().SingleInstance();
         builder.RegisterType<RentalDtoUserIdResolver>().AsSelf().SingleInstance();
 
+        builder.RegisterType<OwnerUserNameResolver>().AsSelf().SingleInstance();
+
         builder.RegisterType<ImagePathResolver>().AsSelf().SingleInstance();
 
         builder.RegisterType<AuthManager>().As<IAuthService>();

@@ -88,9 +88,17 @@ public class BookManager : IBookService
     [CacheRemoveAspect("IBookService.Get")]
     [TransactionScopeAspect]
     [PerformanceAspect(2)]
-    public IResult Update(Book book)
+    public IResult Update(BookDTO book)
     {
-        _bookDal.Update(book);
+        IResult businessResult = BusinessRules.Run(CreateGenreIfNotExists(book.GenreName),
+            CreateAuthorIfNotExists(book.AuthorName));
+        if (businessResult != null)
+        {
+            return new ErrorResult(businessResult.Message);
+        }
+
+        Book newBook = _mapper.Map<Book>(book);
+        _bookDal.Update(newBook);
         return new SuccessResult(Messages.BookUpdated);
     }
 

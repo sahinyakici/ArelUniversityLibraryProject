@@ -20,6 +20,20 @@ namespace WebAPI.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet("GetAllNotRented")]
+        public IActionResult GetAllNotRented(bool withDeleted)
+        {
+            var result = _bookService.GetAll(withDeleted);
+            if (result.Success)
+            {
+                List<Book> books = result.Data.Where(book => book.RentStatus == false).ToList();
+                List<BookDTO> resultBookDetailDto = books.Select(book => _mapper.Map<BookDTO>(book)).ToList();
+                return Ok(new SuccessDataResult<List<BookDTO>>(resultBookDetailDto));
+            }
+
+            return BadRequest(result.Message);
+        }
+
         [HttpGet("GetAll")]
         public IActionResult GetAll(bool withDeleted)
         {
@@ -130,6 +144,18 @@ namespace WebAPI.Controllers
             }
 
             return BadRequest(result);
+        }
+
+        [HttpPut]
+        public IActionResult EditBook(BookDTO book)
+        {
+            var result = _bookService.Update(book);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+
+            return BadRequest(result.Message);
         }
     }
 }

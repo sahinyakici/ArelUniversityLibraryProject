@@ -2,7 +2,7 @@
 
 namespace Entities.DTOs;
 
-public class BookDTO : IDto
+public record BookDTO : IDto
 {
     public Guid BookId { get; set; }
     public string BookName { get; set; }
@@ -14,4 +14,5 @@ public class BookDTO : IDto
     public bool RentStatus { get; set; }
     public float? Money { get; set; }
     public String? ImagePath { get; set; }
+    public String OwnerUserName { get; set; }
 }

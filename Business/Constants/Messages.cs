@@ -61,4 +61,5 @@ public static class Messages
     public static string ImageDeleted = "Resim silindi";
     public static string ImageFound = "Resim bulundu";
     public static string ErroFileCopy = "The specified image file does not exist";
+    public static string PasswordNotSame = "Passwordler uyuşmuyor";
 }

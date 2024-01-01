@@ -35,6 +35,13 @@ public class AuthManager : IAuthService
     [TransactionScopeAspect]
     public IDataResult<User> Register(UserForRegisterDto userForRegisterDto)
     {
+        IResult businessResult =
+            BusinessRules.Run(PasswordsShouldBeSame(userForRegisterDto.Password, userForRegisterDto.PasswordCheck));
+        if (businessResult != null)
+        {
+            return new ErrorDataResult<User>(businessResult.Message);
+        }
+
         User user = _mapper.Map<User>(userForRegisterDto);
         _userService.Add(user);
         IResult businessRuleResult = BusinessRules.Run(AddClaimsForUser(user.UserName));
@@ -104,5 +111,15 @@ public class AuthManager : IAuthService
         UserOperationClaimDto userOperationClaimDto = new UserOperationClaimDto
             { UserName = userName, OperationName = "user" };
         return _userOperationClaimService.Add(userOperationClaimDto);
+    }
+
+    private IResult PasswordsShouldBeSame(string password, string passwordCheck)
+    {
+        if (password.Equals(passwordCheck))
+        {
+            return new SuccessResult();
+        }
+
+        return new ErrorResult(Messages.PasswordNotSame);
     }
 }

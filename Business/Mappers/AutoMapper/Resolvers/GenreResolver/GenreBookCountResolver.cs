@@ -19,7 +19,7 @@ public class GenreBookCountResolver : IValueResolver<Genre, GenreDTO, int>
         var result = _bookService.GetAllByGenre(source.GenreId);
         if (result.Success)
         {
-            int bookCount = result.Data.Count;
+            int bookCount = result.Data.Count(book => book.RentStatus == false);
             return bookCount;
         }
 

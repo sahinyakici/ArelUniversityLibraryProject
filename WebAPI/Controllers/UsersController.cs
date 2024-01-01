@@ -1,5 +1,8 @@
+using AutoMapper;
 using Business.Abstract;
 using Core.Entities.Concrete;
+using Core.Utilities.Results.Concrete;
+using Entities.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
@@ -8,11 +11,13 @@ namespace WebAPI.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
+        private readonly IMapper _mapper;
         private IUserService _userService;
 
-        public UsersController(IUserService userService)
+        public UsersController(IUserService userService, IMapper mapper)
         {
             _userService = userService;
+            _mapper = mapper;
         }
 
         [HttpGet("GetAll")]
@@ -45,7 +50,8 @@ namespace WebAPI.Controllers
             var result = _userService.GetByUserName(userName, withDeleted);
             if (result.Success)
             {
-                return Ok(result);
+                UserGetDto user = _mapper.Map<UserGetDto>(result.Data);
+                return Ok(new SuccessDataResult<UserGetDto>(user));
             }
 
             return BadRequest(result.Message);

@@ -52,8 +52,10 @@ public class GenreManager : IGenreService
     [CacheAspect]
     public IDataResult<Genre> GetByName(string genreName, bool withDeleted = false)
     {
-        Genre genre = _genreDal.Get(genre =>
-            genre.GenreName.ToLower() == genreName.ToLower() && (withDeleted || !genre.IsDeleted));
+        List<Genre> allGenres = _genreDal.GetAll();
+        Genre? genre = allGenres.Find(genre =>
+            string.Equals(genre.GenreName, genreName, StringComparison.InvariantCultureIgnoreCase) &&
+            (withDeleted || !genre.IsDeleted));
         if (genre != null)
         {
             return new SuccessDataResult<Genre>(genre, Messages.GenreWasFound);

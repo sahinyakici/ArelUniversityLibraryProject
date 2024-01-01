@@ -21,7 +21,8 @@ public class MapperProfile : Profile
                 dest => dest.GenreName, opt => opt.MapFrom<GenreNameResolver>())
             .ForMember(dest => dest.AuthorName, opt => opt.MapFrom<AuthorNameResolver>())
             .ForMember(dest => dest.OwnerName, opt => opt.MapFrom<UserNameResolver>())
-            .ForMember(dest => dest.ImagePath, opt => opt.MapFrom<ImagePathResolver>());
+            .ForMember(dest => dest.ImagePath, opt => opt.MapFrom<ImagePathResolver>())
+            .ForMember(dest => dest.OwnerUserName, opt => opt.MapFrom<OwnerUserNameResolver>());
 
         CreateMap<BookDTO, Book>()
             .ForMember(dest => dest.GenreId, opt => opt.MapFrom<GenreIdResolver>())
@@ -56,5 +57,6 @@ public class MapperProfile : Profile
         CreateMap<Genre, GenreDTO>()
             .ForMember(dest => dest.BookCount, opt => opt.MapFrom<GenreBookCountResolver>());
         CreateMap<Author, AuthorDTO>().ReverseMap();
+        CreateMap<UserGetDto, User>().ReverseMap();
     }
 }

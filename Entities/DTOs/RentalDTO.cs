@@ -2,9 +2,10 @@
 
 namespace Entities.DTOs;
 
-public class RentalDTO : IDto
+public record RentalDTO : IDto
 {
     public Guid RentalId { get; set; }
+    public Guid BookId { get; set; }
     public DateTime RentalStart { get; set; }
     public DateTime? RentalStop { get; set; }
     public string UserName { get; set; }

@@ -1,6 +1,8 @@
-﻿namespace Entities.DTOs;
+﻿using Core.Entities;
 
-public class AuthorDTO
+namespace Entities.DTOs;
+
+public record AuthorDTO : IDto
 {
     public Guid AuthorId { get; set; }
     public string AuthorName { get; set; }
